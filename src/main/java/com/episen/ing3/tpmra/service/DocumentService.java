@@ -2,7 +2,6 @@ package com.episen.ing3.tpmra.service;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import javax.net.ssl.SSLEngineResult.Status;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import com.episen.ing3.tpmra.model.Document;
 import com.episen.ing3.tpmra.model.Document.StatusEnum;
 import com.episen.ing3.tpmra.model.DocumentSummary;
 import com.episen.ing3.tpmra.model.DocumentsList;
-import com.episen.ing3.tpmra.model.Lock;
 import com.episen.ing3.tpmra.repository.DocumentRepository;
 
 @Service
@@ -57,21 +55,8 @@ public class DocumentService {
 		}
 		return null;
 	}
-	
-	public Lock getDocumentLock(String documentId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	public Lock putDocumentLock(String documentId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	public Boolean deleteDocumentLock(String documentId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 
 }

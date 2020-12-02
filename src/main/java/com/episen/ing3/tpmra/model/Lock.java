@@ -2,6 +2,7 @@ package com.episen.ing3.tpmra.model;
 
 import java.util.Objects;
 
+import javax.persistence.Id;
 import javax.validation.Valid;
 
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Validated
 public class Lock   {
 
+	@Id
 	@JsonProperty("owner")
 	private String documentId = null;
 
