@@ -15,9 +15,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "a document")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-02T13:05:00.076Z[GMT]")
-
-
 public class Document extends DocumentSummary  {
   @JsonProperty("creator")
   private String creator = null;

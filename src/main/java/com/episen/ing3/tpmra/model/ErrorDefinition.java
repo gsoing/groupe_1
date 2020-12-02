@@ -19,9 +19,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(description = "la description de l'erreur")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-02T13:05:00.076Z[GMT]")
-
-
 public class ErrorDefinition   {
   /**
    * le type d'erreur

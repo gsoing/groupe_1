@@ -1,15 +1,14 @@
-package com.episen.ing3.tpmra.api;
+package com.episen.ing3.tpmra.endpoint;
 
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.hibernate.annotations.Parameter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,28 +17,50 @@ import org.springframework.web.bind.annotation.RestController;
 import com.episen.ing3.tpmra.model.Document;
 import com.episen.ing3.tpmra.model.DocumentsList;
 import com.episen.ing3.tpmra.model.Lock;
+import com.episen.ing3.tpmra.service.DocumentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.extern.slf4j.Slf4j;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-02T13:05:00.076Z[GMT]")
 @RestController
-public class DocumentsApiController implements DocumentsApi {
+@Slf4j
+public class DocumentsApiController {
 
-    private static final Logger log = LoggerFactory.getLogger(DocumentsApiController.class);
+	@Autowired
+    private ObjectMapper objectMapper;
 
-    private final ObjectMapper objectMapper;
+	@Autowired
+    private HttpServletRequest request;
+	
+	@Autowired
+    private DocumentService documentService;
 
-    private final HttpServletRequest request;
-
-    @org.springframework.beans.factory.annotation.Autowired
-    public DocumentsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
-        this.request = request;
-    }
-
-    public ResponseEntity<Document> documentsDocumentIdGet( @PathVariable("documentId") String documentId) {
+	/*
+	 * GET /documents
+	 */
+	@GetMapping("/documents")
+	public ResponseEntity<DocumentsList> documentsGet(@Valid @RequestParam(value = "page", required = false) Integer page, @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+		log.info("ducmentsGet called");
+		String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+        	try {
+        		DocumentsList list = documentService.getAllDocuments(page, pageSize);
+        		if(list==null)
+        			return new ResponseEntity<DocumentsList>(HttpStatus.NOT_FOUND);
+        		else
+        			return new ResponseEntity<DocumentsList>(list,HttpStatus.OK);
+        	}catch(Exception e) { return new ResponseEntity<DocumentsList>(HttpStatus.INTERNAL_SERVER_ERROR);}
+        }
+        return new ResponseEntity<DocumentsList>(HttpStatus.NOT_IMPLEMENTED);
+	}
+	
+	
+	
+	
+	
+	
+	
+    public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") String documentId) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -103,20 +124,6 @@ public class DocumentsApiController implements DocumentsApi {
     public ResponseEntity<Void> documentsDocumentIdStatusPut(@PathVariable("documentId") String documentId, @Valid @RequestBody String body) {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
-    public ResponseEntity<DocumentsList> documentsGet(@Valid @RequestParam(value = "page", required = false) Integer page, @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<DocumentsList>(objectMapper.readValue("{\n  \"data\" : [ {\n    \"created\" : \"2000-01-23T04:56:07.000+00:00\",\n    \"documentId\" : \"documentId\",\n    \"title\" : \"title\",\n    \"updated\" : \"2000-01-23T04:56:07.000+00:00\"\n  }, {\n    \"created\" : \"2000-01-23T04:56:07.000+00:00\",\n    \"documentId\" : \"documentId\",\n    \"title\" : \"title\",\n    \"updated\" : \"2000-01-23T04:56:07.000+00:00\"\n  } ]\n}", DocumentsList.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<DocumentsList>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<DocumentsList>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<DocumentsList> documentsPost(@Valid @RequestBody Document body) {
