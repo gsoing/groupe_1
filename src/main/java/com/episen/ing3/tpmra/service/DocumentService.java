@@ -1,10 +1,16 @@
 package com.episen.ing3.tpmra.service;
 
+import java.awt.List;
+import java.util.ArrayList;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.episen.ing3.tpmra.model.Document;
+import com.episen.ing3.tpmra.model.DocumentSummary;
 import com.episen.ing3.tpmra.model.DocumentsList;
 import com.episen.ing3.tpmra.repository.DocumentRepository;
 
@@ -15,8 +21,13 @@ public class DocumentService {
 	DocumentRepository documentRepository;
 
 	public DocumentsList getAllDocuments(@Valid Integer page, @Valid Integer pageSize) {
-		// TODO Auto-generated method stub
-		return null;
+		@SuppressWarnings("unchecked")
+		ArrayList<Document> listDocument = (ArrayList<Document>) documentRepository.findAll(PageRequest.of(page, pageSize));
+		DocumentsList list = new DocumentsList();
+		for(Document document: listDocument) {
+			list.addDataItem(new DocumentSummary(document.getDocumentId(), document.getCreated(), document.getUpdated(), document.getTitle()));
+		}
+		return list;
 	}
 
 }

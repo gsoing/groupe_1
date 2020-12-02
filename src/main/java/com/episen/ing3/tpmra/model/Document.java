@@ -3,6 +3,7 @@ package com.episen.ing3.tpmra.model;
 import java.util.Objects;
 
 import org.springframework.validation.annotation.Validated;
+import org.threeten.bp.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,7 +17,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "a document")
 @Validated
 public class Document extends DocumentSummary  {
-  @JsonProperty("creator")
+
+@JsonProperty("creator")
   private String creator = null;
 
   @JsonProperty("editor")
@@ -25,6 +27,11 @@ public class Document extends DocumentSummary  {
   @JsonProperty("body")
   private String body = null;
 
+  public Document(String documentId, OffsetDateTime created, OffsetDateTime updated, String title) {
+		super(documentId, created, updated, title);
+	}
+
+  
   /**
    * statut du document
    */

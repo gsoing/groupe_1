@@ -33,8 +33,20 @@ public class DocumentSummary   {
     this.documentId = documentId;
     return this;
   }
+  
+  
 
-  /**
+  public DocumentSummary(String documentId, OffsetDateTime created, OffsetDateTime updated, String title) {
+	super();
+	this.documentId = documentId;
+	this.created = created;
+	this.updated = updated;
+	this.title = title;
+}
+
+
+
+/**
    * identifiant du document
    * @return documentId
    **/
