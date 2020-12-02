@@ -10,5 +10,9 @@ import com.episen.ing3.tpmra.model.Document;
 
 @Repository
 public interface DocumentRepository extends PagingAndSortingRepository<Document, String>{
-	 List findAll(Pageable pageable);
+	List findAll(Pageable pageable);
+	
+	@SuppressWarnings("unchecked")
+	Document save(Document document);
+	
 }
