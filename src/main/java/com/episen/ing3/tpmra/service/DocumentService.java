@@ -30,5 +30,26 @@ public class DocumentService {
 		return list;
 	}
 
+	public DocumentsList createDocument(@Valid Document body) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Document getSingleDocument(String documentId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Document updateDocument(String documentId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Document updateDocumentStatus(String documentId, String status) {
+		// Status devrait être converti en une enum... Bon courage
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
 
