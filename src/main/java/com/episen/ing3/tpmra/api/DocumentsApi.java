@@ -5,138 +5,32 @@
  */
 package com.episen.ing3.tpmra.api;
 
-import io.swagger.model.Document;
-import io.swagger.model.DocumentsList;
-import io.swagger.model.ErrorDefinition;
-import io.swagger.model.Lock;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import javax.validation.Valid;
+
+import org.hibernate.annotations.Parameter;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.CookieValue;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
-import java.util.List;
-import java.util.Map;
+import com.episen.ing3.tpmra.model.Document;
+import com.episen.ing3.tpmra.model.DocumentsList;
+import com.episen.ing3.tpmra.model.ErrorDefinition;
+import com.episen.ing3.tpmra.model.Lock;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-02T13:05:00.076Z[GMT]")
 public interface DocumentsApi {
 
-    @Operation(summary = "Récupère un document", description = "", security = {
-        @SecurityRequirement(name = "basicAuth")    }, tags={ "document" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "le document correspondant à l'identifiant", content = @Content(schema = @Schema(implementation = Document.class))),
-        
-        @ApiResponse(responseCode = "200", description = "unexpected error", content = @Content(schema = @Schema(implementation = ErrorDefinition.class))) })
-    @RequestMapping(value = "/documents/{documentId}",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<Document> documentsDocumentIdGet(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId);
-
-
-    @Operation(summary = "", description = "supprime le verrou sur le document", security = {
-        @SecurityRequirement(name = "basicAuth")    }, tags={ "lock" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "204", description = "le verrou a été supprimé"),
-        
-        @ApiResponse(responseCode = "200", description = "unexpected error", content = @Content(schema = @Schema(implementation = ErrorDefinition.class))) })
-    @RequestMapping(value = "/documents/{documentId}/lock",
-        produces = { "application/json" }, 
-        method = RequestMethod.DELETE)
-    ResponseEntity<Void> documentsDocumentIdLockDelete(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId);
-
-
-    @Operation(summary = "", description = "retourne le verrou posé ou rien si aucun verrou", security = {
-        @SecurityRequirement(name = "basicAuth")    }, tags={ "lock" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "le verrou posé", content = @Content(schema = @Schema(implementation = Lock.class))),
-        
-        @ApiResponse(responseCode = "204", description = "aucun verrou n'est posé"),
-        
-        @ApiResponse(responseCode = "200", description = "unexpected error", content = @Content(schema = @Schema(implementation = ErrorDefinition.class))) })
-    @RequestMapping(value = "/documents/{documentId}/lock",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<Lock> documentsDocumentIdLockGet(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId);
-
-
-    @Operation(summary = "", description = "pose un verrou sur le document", security = {
-        @SecurityRequirement(name = "basicAuth")    }, tags={ "lock" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "le verrou posé", content = @Content(schema = @Schema(implementation = Lock.class))),
-        
-        @ApiResponse(responseCode = "200", description = "unexpected error", content = @Content(schema = @Schema(implementation = ErrorDefinition.class))) })
-    @RequestMapping(value = "/documents/{documentId}/lock",
-        produces = { "application/json" }, 
-        method = RequestMethod.PUT)
-    ResponseEntity<Lock> documentsDocumentIdLockPut(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId);
-
-
-    @Operation(summary = "Met à jour un document", description = "", security = {
-        @SecurityRequirement(name = "basicAuth")    }, tags={ "document" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "le document mis à jour", content = @Content(schema = @Schema(implementation = Document.class))),
-        
-        @ApiResponse(responseCode = "200", description = "unexpected error", content = @Content(schema = @Schema(implementation = ErrorDefinition.class))) })
-    @RequestMapping(value = "/documents/{documentId}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.PUT)
-    ResponseEntity<Document> documentsDocumentIdPut(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Document body);
-
-
-    @Operation(summary = "", description = "définis le status d'un document", security = {
-        @SecurityRequirement(name = "basicAuth")    }, tags={ "status" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "204", description = "rien à retourner"),
-        
-        @ApiResponse(responseCode = "200", description = "unexpected error", content = @Content(schema = @Schema(implementation = ErrorDefinition.class))) })
-    @RequestMapping(value = "/documents/{documentId}/status",
-        produces = { "application/json" }, 
-        consumes = { "text/plain" }, 
-        method = RequestMethod.PUT)
-    ResponseEntity<Void> documentsDocumentIdStatusPut(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId, @Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody String body);
-
-
-    @Operation(summary = "Liste tous les documents", description = "retounre une liste de tous les documents présents dans le système", security = {
-        @SecurityRequirement(name = "basicAuth")    }, tags={ "documents" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "une page de résultat", content = @Content(schema = @Schema(implementation = DocumentsList.class))),
-        
-        @ApiResponse(responseCode = "200", description = "unexpected error", content = @Content(schema = @Schema(implementation = ErrorDefinition.class))) })
-    @RequestMapping(value = "/documents",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<DocumentsList> documentsGet(@Parameter(in = ParameterIn.QUERY, description = "numéro de la page à retourner" ,schema=@Schema()) @Valid @RequestParam(value = "page", required = false) Integer page, @Parameter(in = ParameterIn.QUERY, description = "nombre de documents par page" ,schema=@Schema()) @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize);
-
-
-    @Operation(summary = "Crée un document", description = "", security = {
-        @SecurityRequirement(name = "basicAuth")    }, tags={ "documents" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "The document created", content = @Content(schema = @Schema(implementation = DocumentsList.class))),
-        
-        @ApiResponse(responseCode = "200", description = "unexpected error", content = @Content(schema = @Schema(implementation = ErrorDefinition.class))) })
-    @RequestMapping(value = "/documents",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<DocumentsList> documentsPost(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Document body);
-
+   
 }
 

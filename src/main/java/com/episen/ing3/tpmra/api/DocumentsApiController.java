@@ -1,38 +1,27 @@
 package com.episen.ing3.tpmra.api;
 
-import io.swagger.model.Document;
-import io.swagger.model.DocumentsList;
-import io.swagger.model.ErrorDefinition;
-import io.swagger.model.Lock;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.hibernate.annotations.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.*;
-import javax.validation.Valid;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import com.episen.ing3.tpmra.model.Document;
+import com.episen.ing3.tpmra.model.DocumentsList;
+import com.episen.ing3.tpmra.model.Lock;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2020-12-02T13:05:00.076Z[GMT]")
 @RestController
@@ -50,7 +39,7 @@ public class DocumentsApiController implements DocumentsApi {
         this.request = request;
     }
 
-    public ResponseEntity<Document> documentsDocumentIdGet(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId) {
+    public ResponseEntity<Document> documentsDocumentIdGet( @PathVariable("documentId") String documentId) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -64,12 +53,12 @@ public class DocumentsApiController implements DocumentsApi {
         return new ResponseEntity<Document>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Void> documentsDocumentIdLockDelete(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId) {
+    public ResponseEntity<Void> documentsDocumentIdLockDelete(@PathVariable("documentId") String documentId) {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Lock> documentsDocumentIdLockGet(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId) {
+    public ResponseEntity<Lock> documentsDocumentIdLockGet( @PathVariable("documentId") String documentId) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -83,7 +72,7 @@ public class DocumentsApiController implements DocumentsApi {
         return new ResponseEntity<Lock>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Lock> documentsDocumentIdLockPut(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId) {
+    public ResponseEntity<Lock> documentsDocumentIdLockPut(@PathVariable("documentId") String documentId) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -97,7 +86,7 @@ public class DocumentsApiController implements DocumentsApi {
         return new ResponseEntity<Lock>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Document> documentsDocumentIdPut(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Document body) {
+    public ResponseEntity<Document> documentsDocumentIdPut(@PathVariable("documentId") String documentId, @Valid @RequestBody Document body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -111,12 +100,12 @@ public class DocumentsApiController implements DocumentsApi {
         return new ResponseEntity<Document>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<Void> documentsDocumentIdStatusPut(@Parameter(in = ParameterIn.PATH, description = "identifiant du document à récupérer", required=true, schema=@Schema()) @PathVariable("documentId") String documentId,@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody String body) {
+    public ResponseEntity<Void> documentsDocumentIdStatusPut(@PathVariable("documentId") String documentId, @Valid @RequestBody String body) {
         String accept = request.getHeader("Accept");
         return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<DocumentsList> documentsGet(@Parameter(in = ParameterIn.QUERY, description = "numéro de la page à retourner" ,schema=@Schema()) @Valid @RequestParam(value = "page", required = false) Integer page,@Parameter(in = ParameterIn.QUERY, description = "nombre de documents par page" ,schema=@Schema()) @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+    public ResponseEntity<DocumentsList> documentsGet(@Valid @RequestParam(value = "page", required = false) Integer page, @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -130,7 +119,7 @@ public class DocumentsApiController implements DocumentsApi {
         return new ResponseEntity<DocumentsList>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<DocumentsList> documentsPost(@Parameter(in = ParameterIn.DEFAULT, description = "", schema=@Schema()) @Valid @RequestBody Document body) {
+    public ResponseEntity<DocumentsList> documentsPost(@Valid @RequestBody Document body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
