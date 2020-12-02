@@ -12,16 +12,7 @@ import io.swagger.v3.oas.models.info.License;
 @Configuration
 public class SwaggerDocumentationConfig {
 
-    @Bean
-    public Docket customImplementation(){
-        return new Docket(DocumentationType.OAS_30)
-                .select()
-                    .apis(RequestHandlerSelectors.basePackage("io.swagger.api"))
-                    .build()
-                .directModelSubstitute(org.threeten.bp.LocalDate.class, java.sql.Date.class)
-                .directModelSubstitute(org.threeten.bp.OffsetDateTime.class, java.util.Date.class)
-                .apiInfo(apiInfo());
-    }
+
     @Bean
     public OpenAPI configure() {
         return new OpenAPI()

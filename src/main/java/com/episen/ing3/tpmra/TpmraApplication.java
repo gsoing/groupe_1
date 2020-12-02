@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@EnableOpenApi
 @ComponentScan(basePackages = { "io.swagger", "io.swagger.api" , "io.swagger.configuration"})
 public class TpmraApplication implements CommandLineRunner {
 
@@ -19,7 +18,7 @@ public class TpmraApplication implements CommandLineRunner {
     }
 
     public static void main(String[] args) throws Exception {
-        new SpringApplication(Swagger2SpringBoot.class).run(args);
+        new SpringApplication(TpmraApplication.class).run(args);
     }
 
     class ExitException extends RuntimeException implements ExitCodeGenerator {
