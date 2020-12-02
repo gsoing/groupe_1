@@ -1,6 +1,6 @@
 package com.episen.ing3.tpmra.endpoint;
 
-import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -19,17 +19,13 @@ import com.episen.ing3.tpmra.model.Document;
 import com.episen.ing3.tpmra.model.DocumentsList;
 import com.episen.ing3.tpmra.model.Lock;
 import com.episen.ing3.tpmra.service.DocumentService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @Slf4j
 public class DocumentsApiController {
-
-	@Autowired
-    private ObjectMapper objectMapper;
-
+	
 	@Autowired
     private HttpServletRequest request;
 	
@@ -94,14 +90,15 @@ public class DocumentsApiController {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	Document document = documentService.getSingleDocument(documentId);
-            	log.info("GET /documents/{documentId} : returning the following document " + document);
-            	if(document==null)
+            	Optional<Document> optionalDocument = documentService.getSingleDocument(documentId);
+            	log.info("GET /documents/{documentId} : is the document present? " + optionalDocument.isPresent());
+            	if(optionalDocument.isPresent())
         			return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
         		else
-        			return new ResponseEntity<Document>(document,HttpStatus.OK);
+        			return new ResponseEntity<Document>(optionalDocument.get(),HttpStatus.OK);
             } catch (Exception e) {
             	log.error("GET /documents/{documentId} : An error occured " + e.getMessage());
+            	e.printStackTrace();
                 return new ResponseEntity<Document>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -117,14 +114,16 @@ public class DocumentsApiController {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+            	//if(documentId.equals(body.getId))
             	Document document = documentService.updateDocument(documentId);
-            	log.info("PUT /documents/{documentId} : returning the following document " + document);
+            	log.info("PUT /documents/{documentId} : returning the following document: " + document);
             	if(document==null)
         			return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
         		else
         			return new ResponseEntity<Document>(document,HttpStatus.OK);
-            } catch (IOException e) {
+            } catch (Exception e) {
             	log.error("PUT /documents/{documentId} : An error occured " + e.getMessage());
+            	e.printStackTrace();
                 return new ResponseEntity<Document>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
@@ -140,53 +139,92 @@ public class DocumentsApiController {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	Document document = documentService.updateDocumentStatus(documentId,body);
-            	log.info("PUT /documents/{documentId}/status : returning the following document " + document);
-            	if(document==null)
-        			return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
+            	Boolean result = documentService.updateDocumentStatus(documentId,body);
+            	log.info("PUT /documents/{documentId}/status : Did the update succeed? " + result);
+            	if(result)
+        			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         		else
-        			return new ResponseEntity<Document>(document,HttpStatus.OK);
-            } catch (IOException e) {
+        			return new ResponseEntity<>(HttpStatus.OK);
+            } catch (Exception e) {
             	log.error("PUT /documents/{documentId}/status: An error occured " + e.getMessage());
-                return new ResponseEntity<Document>(HttpStatus.INTERNAL_SERVER_ERROR);
+            	e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         log.info("PUT /documents/{documentId}/status : attribute accept wasn't set to application/json");
-        return new ResponseEntity<Document>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
     
-    
-    public ResponseEntity<Void> documentsDocumentIdLockDelete(@PathVariable("documentId") String documentId) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
+    /*
+     * GET /documents/{documentId}/lock
+     */
     public ResponseEntity<Lock> documentsDocumentIdLockGet( @PathVariable("documentId") String documentId) {
+    	log.info("GET /documents/{documentId}/lock : documentsDocumentIdLockGet called with document id '" + documentId + "'");
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<Lock>(objectMapper.readValue("{\n  \"owner\" : \"owner\",\n  \"created\" : \"2000-01-23T04:56:07.000+00:00\"\n}", Lock.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
+            	Lock lock = documentService.getDocumentLock(documentId);
+            	log.info("GET /documents/{documentId}/lock : returning the following document: " + lock);
+            	if(lock==null)
+        			return new ResponseEntity<Lock>(HttpStatus.NO_CONTENT);
+        		else
+        			return new ResponseEntity<Lock>(lock,HttpStatus.OK);
+            } catch (Exception e) {
+            	log.error("GET /documents/{documentId}/lock : An error occured " + e.getMessage());
+            	e.printStackTrace();
                 return new ResponseEntity<Lock>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
+        log.info("GET /documents/{documentId}/lock : attribute accept wasn't set to application/json");
         return new ResponseEntity<Lock>(HttpStatus.NOT_IMPLEMENTED);
     }
-
+    
+    /*
+     * PUT /documents/{documentId}/lock
+     */
     public ResponseEntity<Lock> documentsDocumentIdLockPut(@PathVariable("documentId") String documentId) {
         String accept = request.getHeader("Accept");
+        log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockGet called with document id '" + documentId + "'");
         if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<Lock>(objectMapper.readValue("{\n  \"owner\" : \"owner\",\n  \"created\" : \"2000-01-23T04:56:07.000+00:00\"\n}", Lock.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
+        	try {
+            	Lock lock = documentService.putDocumentLock(documentId);
+            	log.info("PUT /documents/{documentId}/lock : returning the following document: " + lock);
+            	if(lock==null)
+        			return new ResponseEntity<Lock>(HttpStatus.NOT_FOUND);
+        		else
+        			return new ResponseEntity<Lock>(lock,HttpStatus.OK);
+            } catch (Exception e) {
+            	log.error("PUT /documents/{documentId}/lock : An error occured " + e.getMessage());
+            	e.printStackTrace();
                 return new ResponseEntity<Lock>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
-
+        log.info("PUT /documents/{documentId}/lock : attribute accept wasn't set to application/json");
         return new ResponseEntity<Lock>(HttpStatus.NOT_IMPLEMENTED);
+    }
+    
+    /*
+     * DELETE /documents/{documentId}/lock
+     */
+    public ResponseEntity<Void> documentsDocumentIdLockDelete(@PathVariable("documentId") String documentId) {
+    	String accept = request.getHeader("Accept");
+        log.info("DELETE /documents/{documentId}/lock : documentsDocumentIdLockDelete called with document id '" + documentId + "'");
+        if (accept != null && accept.contains("application/json")) {
+        	try {
+            	Boolean result = documentService.deleteDocumentLock(documentId);
+            	log.info("DELETE /documents/{documentId}/lock : Did the delete succeed? " + result);
+            	if(result)
+        			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        		else
+        			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            } catch (Exception e) {
+            	log.error("DELETE /documents/{documentId}/lock : An error occured " + e.getMessage());
+            	e.printStackTrace();
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        log.info("DELETE /documents/{documentId}/lock : attribute accept wasn't set to application/json");
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
     }
 
 }
