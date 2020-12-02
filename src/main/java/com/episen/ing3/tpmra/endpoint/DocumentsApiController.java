@@ -8,17 +8,21 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.episen.ing3.tpmra.model.Document;
+import com.episen.ing3.tpmra.model.Document.StatusEnum;
 import com.episen.ing3.tpmra.model.DocumentsList;
 import com.episen.ing3.tpmra.model.Lock;
 import com.episen.ing3.tpmra.service.DocumentService;
+import com.episen.ing3.tpmra.service.LockService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +35,8 @@ public class DocumentsApiController {
 	
 	@Autowired
     private DocumentService documentService;
+	@Autowired
+	private LockService lockService;
 
 	/*
 	 * GET /documents
@@ -85,6 +91,7 @@ public class DocumentsApiController {
 	/*
 	 * GET /documents/{documentId}
 	 */
+	@GetMapping("/documents/{documentId}")
     public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") String documentId) {
     	log.info("GET /documents/{documentId} : documentsDocumentIdGet called with document id '" + documentId + "'");
         String accept = request.getHeader("Accept");
@@ -109,13 +116,16 @@ public class DocumentsApiController {
 	/*
 	 * PUT /documents/{documentId}
 	 */
+	@PutMapping("/documents/{documentId}")
     public ResponseEntity<Document> documentsDocumentIdPut(@PathVariable("documentId") String documentId, @Valid @RequestBody Document body) {
     	log.info("PUT /documents/{documentId} : documentsDocumentIdPut called with document id '" + documentId + "' and body '" + body + "'");
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	//if(documentId.equals(body.getId))
-            	Document document = documentService.updateDocument(documentId);
+            	if(!documentId.equals(body.getDocumentId())) {
+            		return new ResponseEntity<Document>(HttpStatus.BAD_REQUEST); 
+            	}
+            	Document document = documentService.updateDocument(body);
             	log.info("PUT /documents/{documentId} : returning the following document: " + document);
             	if(document==null)
         			return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
@@ -134,14 +144,15 @@ public class DocumentsApiController {
     /*
      * PUT /documents/{documentId}/status:
      */
+	@PutMapping("/documents/{documentId}/status")
     public ResponseEntity<Void> documentsDocumentIdStatusPut(@PathVariable("documentId") String documentId, @Valid @RequestBody String body) {
     	log.info("PUT /documents/{documentId}/status : documentsDocumentIdStatusPut called with document id '" + documentId + "' and body '" + body + "'");
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	Boolean result = documentService.updateDocumentStatus(documentId,body);
-            	log.info("PUT /documents/{documentId}/status : Did the update succeed? " + result);
-            	if(result)
+            	Document document = documentService.updateDocumentStatus(documentId, StatusEnum.fromValue(body));
+            	log.info("PUT /documents/{documentId}/status : returning the following document: " + document);
+            	if(document==null)
         			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         		else
         			return new ResponseEntity<>(HttpStatus.OK);
@@ -158,17 +169,18 @@ public class DocumentsApiController {
     /*
      * GET /documents/{documentId}/lock
      */
+	@GetMapping("/documents/{documentId}/lock")
     public ResponseEntity<Lock> documentsDocumentIdLockGet( @PathVariable("documentId") String documentId) {
     	log.info("GET /documents/{documentId}/lock : documentsDocumentIdLockGet called with document id '" + documentId + "'");
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	Lock lock = documentService.getDocumentLock(documentId);
-            	log.info("GET /documents/{documentId}/lock : returning the following document: " + lock);
-            	if(lock==null)
+            	Optional<Lock> optionalLock = lockService.getDocumentLock(documentId);
+            	log.info("GET /documents/{documentId}/lock : is the lock present? : " + optionalLock.isPresent());
+            	if(optionalLock.isPresent())
         			return new ResponseEntity<Lock>(HttpStatus.NO_CONTENT);
         		else
-        			return new ResponseEntity<Lock>(lock,HttpStatus.OK);
+        			return new ResponseEntity<Lock>(optionalLock.get(),HttpStatus.OK);
             } catch (Exception e) {
             	log.error("GET /documents/{documentId}/lock : An error occured " + e.getMessage());
             	e.printStackTrace();
@@ -182,12 +194,13 @@ public class DocumentsApiController {
     /*
      * PUT /documents/{documentId}/lock
      */
+	@PutMapping("/documents/{documentId}/lock")
     public ResponseEntity<Lock> documentsDocumentIdLockPut(@PathVariable("documentId") String documentId) {
         String accept = request.getHeader("Accept");
         log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockGet called with document id '" + documentId + "'");
         if (accept != null && accept.contains("application/json")) {
         	try {
-            	Lock lock = documentService.putDocumentLock(documentId);
+            	Lock lock = lockService.putDocumentLock(documentId);
             	log.info("PUT /documents/{documentId}/lock : returning the following document: " + lock);
             	if(lock==null)
         			return new ResponseEntity<Lock>(HttpStatus.NOT_FOUND);
@@ -206,12 +219,13 @@ public class DocumentsApiController {
     /*
      * DELETE /documents/{documentId}/lock
      */
+	@DeleteMapping("/documents/{documentId}/lock")
     public ResponseEntity<Void> documentsDocumentIdLockDelete(@PathVariable("documentId") String documentId) {
     	String accept = request.getHeader("Accept");
         log.info("DELETE /documents/{documentId}/lock : documentsDocumentIdLockDelete called with document id '" + documentId + "'");
         if (accept != null && accept.contains("application/json")) {
         	try {
-            	Boolean result = documentService.deleteDocumentLock(documentId);
+            	Boolean result = lockService.deleteDocumentLock(documentId);
             	log.info("DELETE /documents/{documentId}/lock : Did the delete succeed? " + result);
             	if(result)
         			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
