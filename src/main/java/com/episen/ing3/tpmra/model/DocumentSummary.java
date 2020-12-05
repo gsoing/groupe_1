@@ -3,41 +3,26 @@ package com.episen.ing3.tpmra.model;
 import java.util.Objects;
 
 import javax.persistence.Id;
-import javax.validation.Valid;
+import javax.persistence.MappedSuperclass;
 
-import org.springframework.validation.annotation.Validated;
 import org.threeten.bp.OffsetDateTime;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
-/**
- * résumé d'un document
- */
-@Schema(description = "résumé d'un document")
-@Validated
+@MappedSuperclass
 public class DocumentSummary   {
 	
 	@Id
-	@JsonProperty("documentId")
-	private String documentId = null;
+	protected String documentId = null;
 
-	@JsonProperty("created")
-	private OffsetDateTime created = null;
+	protected OffsetDateTime created = null;
 
-	@JsonProperty("updated")
-	private OffsetDateTime updated = null;
+	protected OffsetDateTime updated = null;
 
-	@JsonProperty("title")
-	private String title = null;
+	protected String title = null;
 
 	public DocumentSummary documentId(String documentId) {
 		this.documentId = documentId;
 		return this;
 	}
-
-
 
 	public DocumentSummary(String documentId, OffsetDateTime created, OffsetDateTime updated, String title) {
 		super();
@@ -46,14 +31,6 @@ public class DocumentSummary   {
 		this.updated = updated;
 		this.title = title;
 	}
-
-
-
-	/**
-	 * identifiant du document
-	 * @return documentId
-	 **/
-	@Schema(description = "identifiant du document")
 
 	public String getDocumentId() {
 		return documentId;
@@ -68,13 +45,6 @@ public class DocumentSummary   {
 		return this;
 	}
 
-	/**
-	 * la date de création
-	 * @return created
-	 **/
-	@Schema(description = "la date de création")
-
-	@Valid
 	public OffsetDateTime getCreated() {
 		return created;
 	}
@@ -87,14 +57,7 @@ public class DocumentSummary   {
 		this.updated = updated;
 		return this;
 	}
-
-	/**
-	 * date de la mise à jour
-	 * @return updated
-	 **/
-	@Schema(description = "date de la mise à jour")
-
-	@Valid
+	
 	public OffsetDateTime getUpdated() {
 		return updated;
 	}
@@ -107,12 +70,6 @@ public class DocumentSummary   {
 		this.title = title;
 		return this;
 	}
-
-	/**
-	 * titre du document
-	 * @return title
-	 **/
-	@Schema(description = "titre du document")
 
 	public String getTitle() {
 		return title;

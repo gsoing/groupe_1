@@ -35,6 +35,7 @@ public class DocumentsApiController {
 	
 	@Autowired
     private DocumentService documentService;
+	
 	@Autowired
 	private LockService lockService;
 

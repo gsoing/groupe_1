@@ -2,14 +2,14 @@ package com.episen.ing3.tpmra.service;
 
 import java.util.Optional;
 
-import org.joda.time.field.OffsetDateTimeField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.OffsetDateTime;
 
-import com.episen.ing3.tpmra.model.Lock;
 import com.episen.ing3.tpmra.repository.DocumentRepository;
 import com.episen.ing3.tpmra.repository.LockRepository;
+
+import com.episen.ing3.tpmra.model.Lock;
 
 @Service
 public class LockService {

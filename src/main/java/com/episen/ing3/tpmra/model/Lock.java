@@ -2,33 +2,20 @@ package com.episen.ing3.tpmra.model;
 
 import java.util.Objects;
 
+import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.validation.Valid;
 
-import org.springframework.validation.annotation.Validated;
 import org.threeten.bp.OffsetDateTime;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
-/**
- * un verrou
- */
-@Schema(description = "un verrou")
-@Validated
+@Entity
 public class Lock   {
 
 	@Id
-	@JsonProperty("owner")
 	private String documentId = null;
 
-	@JsonProperty("owner")
 	private String owner = null;
 
-	@JsonProperty("created")
 	private OffsetDateTime created = null;
-
 
 	public Lock(String documentId, String owner, OffsetDateTime created) {
 		super();
@@ -36,12 +23,6 @@ public class Lock   {
 		this.owner = owner;
 		this.created = created;
 	}
-
-	/**
-	 * utilisateur propriétaire du verrou
-	 * @return owner
-	 **/
-	@Schema(description = "utilisateur propriétaire du verrou")
 
 	public String getOwner() {
 		return owner;
@@ -56,13 +37,6 @@ public class Lock   {
 		return this;
 	}
 
-	/**
-	 * date de la pose du verrou
-	 * @return created
-	 **/
-	@Schema(description = "date de la pose du verrou")
-
-	@Valid
 	public OffsetDateTime getCreated() {
 		return created;
 	}
@@ -71,8 +45,6 @@ public class Lock   {
 		this.created = created;
 	}
 
-
-	@Override
 	public boolean equals(java.lang.Object o) {
 		if (this == o) {
 			return true;
@@ -85,10 +57,6 @@ public class Lock   {
 				Objects.equals(this.created, lock.created);
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(owner, created);
-	}
 
 	@Override
 	public String toString() {

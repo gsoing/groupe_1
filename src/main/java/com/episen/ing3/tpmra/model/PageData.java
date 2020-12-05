@@ -2,34 +2,16 @@ package com.episen.ing3.tpmra.model;
 
 import java.util.Objects;
 
-import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
-/**
- * objet générique pour les résultats de recherche
- */
-@Schema(description = "objet générique pour les résultats de recherche")
-@Validated
 public class PageData   {
-  @JsonProperty("page")
+
   private Integer page = null;
 
-  @JsonProperty("nbElements")
   private Integer nbElements = null;
 
   public PageData page(Integer page) {
     this.page = page;
     return this;
   }
-
-  /**
-   * le numéro de la page courante
-   * @return page
-   **/
-  @Schema(description = "le numéro de la page courante")
   
     public Integer getPage() {
     return page;
@@ -43,12 +25,6 @@ public class PageData   {
     this.nbElements = nbElements;
     return this;
   }
-
-  /**
-   * le nombre total d'element
-   * @return nbElements
-   **/
-  @Schema(description = "le nombre total d'element")
   
     public Integer getNbElements() {
     return nbElements;

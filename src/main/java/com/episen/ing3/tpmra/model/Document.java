@@ -2,39 +2,27 @@ package com.episen.ing3.tpmra.model;
 
 import java.util.Objects;
 
-import org.springframework.validation.annotation.Validated;
+import javax.persistence.Entity;
+
 import org.threeten.bp.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import io.swagger.v3.oas.annotations.media.Schema;
-
-/**
- * a document
- */
-@Schema(description = "a document")
-@Validated
+@Entity
 public class Document extends DocumentSummary  {
 
-@JsonProperty("creator")
   private String creator = null;
 
-  @JsonProperty("editor")
   private String editor = null;
 
-  @JsonProperty("body")
   private String body = null;
 
   public Document(String documentId, OffsetDateTime created, OffsetDateTime updated, String title) {
 		super(documentId, created, updated, title);
 	}
 
-  
-  /**
-   * statut du document
-   */
   public enum StatusEnum {
     CREATED("CREATED"),
     
@@ -70,12 +58,6 @@ public class Document extends DocumentSummary  {
     return this;
   }
 
-  /**
-   * le nom du créateur du document
-   * @return creator
-   **/
-  @Schema(description = "le nom du créateur du document")
-  
     public String getCreator() {
     return creator;
   }
@@ -88,12 +70,6 @@ public class Document extends DocumentSummary  {
     this.editor = editor;
     return this;
   }
-
-  /**
-   * le nom du dernier utilisateur qui l'a mis à jour
-   * @return editor
-   **/
-  @Schema(description = "le nom du dernier utilisateur qui l'a mis à jour")
   
     public String getEditor() {
     return editor;
@@ -107,12 +83,6 @@ public class Document extends DocumentSummary  {
     this.body = body;
     return this;
   }
-
-  /**
-   * le texte du document
-   * @return body
-   **/
-  @Schema(description = "le texte du document")
   
     public String getBody() {
     return body;
@@ -127,12 +97,6 @@ public class Document extends DocumentSummary  {
     return this;
   }
 
-  /**
-   * statut du document
-   * @return status
-   **/
-  @Schema(description = "statut du document")
-  
     public StatusEnum getStatus() {
     return status;
   }

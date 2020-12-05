@@ -6,23 +6,14 @@ import java.util.Objects;
 
 import javax.validation.Valid;
 
-import org.springframework.validation.annotation.Validated;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-/**
- * la description de l&#x27;erreur
- */
-@Schema(description = "la description de l'erreur")
-@Validated
 public class ErrorDefinition   {
-  /**
-   * le type d'erreur
-   */
+   
   public enum ErrorTypeEnum {
     TECHNICAL("TECHNICAL"),
     

@@ -4,22 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.validation.Valid;
-
-import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
-/**
- * la liste des résultats d&#x27;une recherche de document
- */
-@Schema(description = "la liste des résultats d'une recherche de document")
-@Validated
 public class DocumentsList extends PageData  {
-  @JsonProperty("data")
-  @Valid
+	
   private List<DocumentSummary> data = null;
 
   public DocumentsList data(List<DocumentSummary> data) {
@@ -35,12 +21,6 @@ public class DocumentsList extends PageData  {
     return this;
   }
 
-  /**
-   * Get data
-   * @return data
-   **/
-  @Schema(description = "")
-      @Valid
     public List<DocumentSummary> getData() {
     return data;
   }

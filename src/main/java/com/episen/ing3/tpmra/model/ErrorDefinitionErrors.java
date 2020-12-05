@@ -2,33 +2,16 @@ package com.episen.ing3.tpmra.model;
 
 import java.util.Objects;
 
-import org.springframework.validation.annotation.Validated;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-
-/**
- * ErrorDefinitionErrors
- */
-@Validated
 public class ErrorDefinitionErrors   {
-  @JsonProperty("errorCode")
+	
   private String errorCode = null;
 
-  @JsonProperty("errorMessage")
   private String errorMessage = null;
 
   public ErrorDefinitionErrors errorCode(String errorCode) {
     this.errorCode = errorCode;
     return this;
   }
-
-  /**
-   * le code de l'erreur
-   * @return errorCode
-   **/
-  @Schema(description = "le code de l'erreur")
   
     public String getErrorCode() {
     return errorCode;
@@ -42,12 +25,6 @@ public class ErrorDefinitionErrors   {
     this.errorMessage = errorMessage;
     return this;
   }
-
-  /**
-   * message d'erreur
-   * @return errorMessage
-   **/
-  @Schema(description = "message d'erreur")
   
     public String getErrorMessage() {
     return errorMessage;
