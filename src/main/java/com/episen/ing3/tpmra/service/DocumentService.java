@@ -55,7 +55,7 @@ public class DocumentService {
 		Optional<Document> doc= documentRepository.findById(documentId);
 		if(doc.isPresent()) {
 			doc.get().setStatus(status);
-			documentRepository.deleteById(documentId);
+			//documentRepository.deleteById(documentId);
 			return documentRepository.save(doc.get());
 		}
 		return null;

@@ -156,12 +156,14 @@ public class DocumentsApiController {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	Document document = documentService.updateDocumentStatus(documentId, StatusEnum.fromValue(body));
-            	log.info("PUT /documents/{documentId}/status : returning the following document: " + document);
+            	StatusEnum status = StatusEnum.fromValue(body);
+            	if(status==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            	Document document = documentService.updateDocumentStatus(documentId, status);
+            	log.info("PUT /documents/{documentId}/status : the following document was returned: " + document);
             	if(document==null)
         			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         		else
-        			return new ResponseEntity<>(HttpStatus.OK);
+        			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             } catch (Exception e) {
             	log.error("PUT /documents/{documentId}/status: An error occured " + e.getMessage());
             	e.printStackTrace();
