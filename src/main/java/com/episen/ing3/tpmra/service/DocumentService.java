@@ -58,18 +58,21 @@ public class DocumentService {
 
 	}
 
-	public Document updateDocument(Document document, String userName, Boolean relecteur) {
+	public Document updateDocument(Integer documentId, Document document, String userName, Boolean relecteur) {
 		Optional<Lock> lock = lockRepository.findById(document.getDocumentId());
+		Optional<Document> doc = documentRepository.findById(documentId);
 		if(lock.isPresent()) {
 			if(!lock.get().getOwner().equals(userName)) {
 				return null; 
 			}
 		}
-		if(document.getStatus().equals(StatusEnum.VALIDATED) && !relecteur)
+		if(doc.get().getStatus().equals(StatusEnum.VALIDATED) && !relecteur)
 			return null; 
 		OffsetDateTime dateTime = OffsetDateTime.now();
-		document.setUpdated(dateTime);
-		document.setEditor(userName);
+		doc.get().setUpdated(dateTime);
+		doc.get().setEditor(userName);
+		doc.get().setTitle(document.getTitle());
+		doc.get().setBody(document.getBody());
 		return documentRepository.save(document);
 	}
 
