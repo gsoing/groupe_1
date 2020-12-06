@@ -14,6 +14,7 @@ public class DocumentSummary   {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "documentId")
 	protected Integer documentId = null;
 
 	@Column(name = "created")
@@ -36,6 +37,9 @@ public class DocumentSummary   {
 		this.created = created;
 		this.updated = updated;
 		this.title = title;
+	}
+
+	public DocumentSummary() {
 	}
 
 	public Integer getDocumentId() {

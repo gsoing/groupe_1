@@ -30,11 +30,11 @@ public class Document extends DocumentSummary  {
 		this.editor=editor;
 		this.body=body;
 	}
-	/*
-  public Document(@JsonProperty("documentId") String documentId,@JsonProperty("created") @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ") OffsetDateTime created, @JsonProperty("updated") @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ") OffsetDateTime updated, @JsonProperty("title") String title) {
-		super(documentId, created, updated, title);
-	}*/
-
+	
+	public Document() {
+		super();
+	}
+	
 	public enum StatusEnum {
 		CREATED("CREATED"),
 
