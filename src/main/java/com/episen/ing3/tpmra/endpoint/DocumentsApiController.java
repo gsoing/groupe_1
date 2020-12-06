@@ -138,7 +138,6 @@ public class DocumentsApiController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_RELECTEUR")))
 			relecteur=true;
-		log.info("Debug >> Suis-je un relecteur? " + relecteur);
 		/* Main treatment */
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
@@ -146,7 +145,7 @@ public class DocumentsApiController {
 				Document document = documentService.updateDocument(documentId, body,principal.getName(),relecteur);
 				log.info("PUT /documents/{documentId} : returning the following document: " + document);
 				if(document==null)
-					return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
+					return new ResponseEntity<Document>(HttpStatus.UNAUTHORIZED);
 				else
 					return new ResponseEntity<Document>(document,HttpStatus.OK);
 			} catch (Exception e) {

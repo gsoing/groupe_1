@@ -6,6 +6,7 @@ import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,6 +15,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Entity
 @Table(name="Document")
 public class Document extends DocumentSummary  {
+	
+	@Version
+	private Integer version;
 
 	@Column(name = "creator")
 	private String creator;
