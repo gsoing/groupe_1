@@ -183,7 +183,7 @@ public class DocumentsApiController {
             try {
             	Optional<Lock> optionalLock = lockService.getDocumentLock(documentId);
             	log.info("GET /documents/{documentId}/lock : is the lock present? : " + optionalLock.isPresent());
-            	if(optionalLock.isPresent())
+            	if(!optionalLock.isPresent())
         			return new ResponseEntity<Lock>(HttpStatus.NO_CONTENT);
         		else
         			return new ResponseEntity<Lock>(optionalLock.get(),HttpStatus.OK);
@@ -203,7 +203,7 @@ public class DocumentsApiController {
 	@PutMapping("/documents/{documentId}/lock")
     public ResponseEntity<Lock> documentsDocumentIdLockPut(@PathVariable("documentId") Integer documentId) {
         String accept = request.getHeader("Accept");
-        log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockGet called with document id '" + documentId + "'");
+        log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockPut called with document id '" + documentId + "'");
         if (accept != null && accept.contains("application/json")) {
         	try {
             	Lock lock = lockService.putDocumentLock(documentId);
