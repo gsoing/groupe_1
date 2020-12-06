@@ -3,6 +3,9 @@ package com.episen.ing3.tpmra.model;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
@@ -10,20 +13,24 @@ import javax.persistence.MappedSuperclass;
 public class DocumentSummary   {
 	
 	@Id
-	protected String documentId = null;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	protected Integer documentId = null;
 
+	@Column(name = "created")
 	protected OffsetDateTime created = null;
 
+	@Column(name = "updated")
 	protected OffsetDateTime updated = null;
 
+	@Column(name = "title")
 	protected String title = null;
 
-	public DocumentSummary documentId(String documentId) {
+	public DocumentSummary documentId(Integer documentId) {
 		this.documentId = documentId;
 		return this;
 	}
 
-	public DocumentSummary(String documentId, OffsetDateTime created, OffsetDateTime updated, String title) {
+	public DocumentSummary(Integer documentId, OffsetDateTime created, OffsetDateTime updated, String title) {
 		super();
 		this.documentId = documentId;
 		this.created = created;
@@ -31,11 +38,11 @@ public class DocumentSummary   {
 		this.title = title;
 	}
 
-	public String getDocumentId() {
+	public Integer getDocumentId() {
 		return documentId;
 	}
 
-	public void setDocumentId(String documentId) {
+	public void setDocumentId(Integer documentId) {
 		this.documentId = documentId;
 	}
 
