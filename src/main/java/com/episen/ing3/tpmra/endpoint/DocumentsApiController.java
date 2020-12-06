@@ -142,7 +142,7 @@ public class DocumentsApiController {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
-				Document document = documentService.updateDocument(body,principal.getName(),relecteur);
+				Document document = documentService.updateDocument(documentId, body,principal.getName(),relecteur);
 				log.info("PUT /documents/{documentId} : returning the following document: " + document);
 				if(document==null)
 					return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
