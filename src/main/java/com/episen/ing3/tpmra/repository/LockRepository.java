@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.episen.ing3.tpmra.model.Lock;
 
 @Repository
-public interface LockRepository extends CrudRepository<Lock, String>{
+public interface LockRepository extends CrudRepository<Lock, Integer>{
 
 }

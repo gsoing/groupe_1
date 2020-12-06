@@ -14,13 +14,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Lock   {
 
 	@Id
-	private String documentId = null;
+	private Integer documentId = null;
 
 	private String owner = null;
 
 	private OffsetDateTime created = null;
 
-	public Lock(@JsonProperty("documentId") String documentId, @JsonProperty("owner") String owner, @JsonProperty("created") OffsetDateTime created) {
+	public Lock(@JsonProperty("documentId") Integer documentId, @JsonProperty("owner") String owner, @JsonProperty("created") OffsetDateTime created) {
 		super();
 		this.documentId = documentId;
 		this.owner = owner;

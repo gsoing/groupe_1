@@ -43,7 +43,7 @@ public class DocumentService {
 	}
 
 	public Optional<Document> getSingleDocument(Integer documentId) {
-		return documentRepository.findById(documentId.toString());
+		return documentRepository.findById(documentId);
 
 	}
 
@@ -51,7 +51,7 @@ public class DocumentService {
 		return documentRepository.save(document);
 	}
 
-	public Document updateDocumentStatus(String documentId, StatusEnum status) {
+	public Document updateDocumentStatus(Integer documentId, StatusEnum status) {
 		Optional<Document> doc= documentRepository.findById(documentId);
 		if(doc.isPresent()) {
 			doc.get().setStatus(status);

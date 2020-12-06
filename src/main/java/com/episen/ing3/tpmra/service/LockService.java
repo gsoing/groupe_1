@@ -18,12 +18,12 @@ public class LockService {
 	@Autowired
 	DocumentRepository documentRepository;
 
-	public Optional<Lock> getDocumentLock(String documentId) {
+	public Optional<Lock> getDocumentLock(Integer documentId) {
 		return lockRepository.findById(documentId);
 
 	}
 
-	public Lock putDocumentLock(String documentId) {
+	public Lock putDocumentLock(Integer documentId) {
 		if(documentRepository.findById(documentId).isPresent()) {
 			OffsetDateTime dateTime = OffsetDateTime.now();
 			Lock lock = new Lock(documentId, null, dateTime);
@@ -33,7 +33,7 @@ public class LockService {
 
 	}
 
-	public Boolean deleteDocumentLock(String documentId) {
+	public Boolean deleteDocumentLock(Integer documentId) {
 		lockRepository.deleteById(documentId);
 		if(this.getDocumentLock(documentId).isPresent()) {
 			return false; 

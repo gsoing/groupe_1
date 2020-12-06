@@ -123,7 +123,7 @@ public class DocumentsApiController {
 	 * PUT /documents/{documentId}
 	 */
 	@PutMapping("/documents/{documentId}")
-    public ResponseEntity<Document> documentsDocumentIdPut(@PathVariable("documentId") String documentId, @Valid @RequestBody Document body) {
+    public ResponseEntity<Document> documentsDocumentIdPut(@PathVariable("documentId") Integer documentId, @Valid @RequestBody Document body) {
     	log.info("PUT /documents/{documentId} : documentsDocumentIdPut called with document id '" + documentId + "' and body '" + body + "'");
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -151,7 +151,7 @@ public class DocumentsApiController {
      * PUT /documents/{documentId}/status:
      */
 	@PutMapping("/documents/{documentId}/status")
-    public ResponseEntity<Void> documentsDocumentIdStatusPut(@PathVariable("documentId") String documentId, @Valid @RequestBody String body) {
+    public ResponseEntity<Void> documentsDocumentIdStatusPut(@PathVariable("documentId") Integer documentId, @Valid @RequestBody String body) {
     	log.info("PUT /documents/{documentId}/status : documentsDocumentIdStatusPut called with document id '" + documentId + "' and body '" + body + "'");
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -176,7 +176,7 @@ public class DocumentsApiController {
      * GET /documents/{documentId}/lock
      */
 	@GetMapping("/documents/{documentId}/lock")
-    public ResponseEntity<Lock> documentsDocumentIdLockGet( @PathVariable("documentId") String documentId) {
+    public ResponseEntity<Lock> documentsDocumentIdLockGet( @PathVariable("documentId") Integer documentId) {
     	log.info("GET /documents/{documentId}/lock : documentsDocumentIdLockGet called with document id '" + documentId + "'");
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -201,7 +201,7 @@ public class DocumentsApiController {
      * PUT /documents/{documentId}/lock
      */
 	@PutMapping("/documents/{documentId}/lock")
-    public ResponseEntity<Lock> documentsDocumentIdLockPut(@PathVariable("documentId") String documentId) {
+    public ResponseEntity<Lock> documentsDocumentIdLockPut(@PathVariable("documentId") Integer documentId) {
         String accept = request.getHeader("Accept");
         log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockGet called with document id '" + documentId + "'");
         if (accept != null && accept.contains("application/json")) {
@@ -226,7 +226,7 @@ public class DocumentsApiController {
      * DELETE /documents/{documentId}/lock
      */
 	@DeleteMapping("/documents/{documentId}/lock")
-    public ResponseEntity<Void> documentsDocumentIdLockDelete(@PathVariable("documentId") String documentId) {
+    public ResponseEntity<Void> documentsDocumentIdLockDelete(@PathVariable("documentId") Integer documentId) {
     	String accept = request.getHeader("Accept");
         log.info("DELETE /documents/{documentId}/lock : documentsDocumentIdLockDelete called with document id '" + documentId + "'");
         if (accept != null && accept.contains("application/json")) {
