@@ -3,13 +3,13 @@ package com.episen.ing3.tpmra.endpoint;
 import java.security.Principal;
 import java.util.Optional;
 
-import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,7 +47,7 @@ public class DocumentsApiController {
 	 * GET /documents
 	 */
 	@GetMapping("/documents")
-	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
+	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
 	public ResponseEntity<DocumentsList> documentsGet(@Valid @RequestParam(value = "page", required = false) Integer page, @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize) {
 		log.info("GET /documents : documentsGet called with values page (" + page + "), pageSize(" + pageSize + ")");
 		String accept = request.getHeader("Accept");
@@ -78,7 +78,7 @@ public class DocumentsApiController {
 	 * POST /documents
 	 */
 	@PostMapping("/documents")
-	@RolesAllowed(value = { "REDACTEUR" })
+	@Secured(value = { "ROLE_REDACTEUR" })
 	public ResponseEntity<DocumentsList> documentsPost(Principal principal, @Valid @RequestBody Document body) {
 		log.info("POST /documents : documentsPost called with document body '" + body + "'");
 		String accept = request.getHeader("Accept");
@@ -104,7 +104,7 @@ public class DocumentsApiController {
 	 * GET /documents/{documentId}
 	 */
 	@GetMapping("/documents/{documentId}")
-	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
+	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
 	public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") Integer documentId) {
 		log.info("GET /documents/{documentId} : documentsDocumentIdGet called with document id '" + documentId + "'");
 		String accept = request.getHeader("Accept");
@@ -130,14 +130,15 @@ public class DocumentsApiController {
 	 * PUT /documents/{documentId}
 	 */
 	@PutMapping("/documents/{documentId}")
-	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
+	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
 	public ResponseEntity<Document> documentsDocumentIdPut(Principal principal, @PathVariable("documentId") Integer documentId, @Valid @RequestBody Document body) {
 		log.info("PUT /documents/{documentId} : documentsDocumentIdPut called with document id '" + documentId + "' and body '" + body + "'");
-		/* Checking if its role is RELECTEUR */
+		/* Checking if its role is ROLE_RELECTEUR */
 		Boolean relecteur = false;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("RELECTEUR")))
+		if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_RELECTEUR")))
 			relecteur=true;
+		log.info("Debug >> Suis-je un relecteur? " + relecteur);
 		/* Main treatment */
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
@@ -162,7 +163,7 @@ public class DocumentsApiController {
 	 * PUT /documents/{documentId}/status:
 	 */
 	@PutMapping("/documents/{documentId}/status")
-	@RolesAllowed(value = { "RELECTEUR" })
+	@Secured(value = { "ROLE_RELECTEUR" })
 	public ResponseEntity<Void> documentsDocumentIdStatusPut(@PathVariable("documentId") Integer documentId, @Valid @RequestBody String body) {
 		log.info("PUT /documents/{documentId}/status : documentsDocumentIdStatusPut called with document id '" + documentId + "' and body '" + body + "'");
 		String accept = request.getHeader("Accept");
@@ -190,7 +191,7 @@ public class DocumentsApiController {
 	 * GET /documents/{documentId}/lock
 	 */
 	@GetMapping("/documents/{documentId}/lock")
-	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
+	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
 	public ResponseEntity<Lock> documentsDocumentIdLockGet( @PathVariable("documentId") Integer documentId) {
 		log.info("GET /documents/{documentId}/lock : documentsDocumentIdLockGet called with document id '" + documentId + "'");
 		String accept = request.getHeader("Accept");
@@ -216,7 +217,7 @@ public class DocumentsApiController {
 	 * PUT /documents/{documentId}/lock
 	 */
 	@PutMapping("/documents/{documentId}/lock")
-	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
+	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
 	public ResponseEntity<Lock> documentsDocumentIdLockPut(Principal principal, @PathVariable("documentId") Integer documentId) {
 		String accept = request.getHeader("Accept");
 		log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockPut called with document id '" + documentId + "'");
@@ -242,7 +243,7 @@ public class DocumentsApiController {
 	 * DELETE /documents/{documentId}/lock
 	 */
 	@DeleteMapping("/documents/{documentId}/lock")
-	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
+	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
 	public ResponseEntity<Void> documentsDocumentIdLockDelete(Principal principal, @PathVariable("documentId") Integer documentId) {
 		String accept = request.getHeader("Accept");
 		log.info("DELETE /documents/{documentId}/lock : documentsDocumentIdLockDelete called with document id '" + documentId + "'");
