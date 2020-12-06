@@ -2,6 +2,7 @@ package com.episen.ing3.tpmra.endpoint;
 
 import java.util.Optional;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -43,6 +44,7 @@ public class DocumentsApiController {
 	 * GET /documents
 	 */
 	@GetMapping("/documents")
+	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
 	public ResponseEntity<DocumentsList> documentsGet(@Valid @RequestParam(value = "page", required = false) Integer page, @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize) {
 		log.info("GET /documents : documentsGet called with values page (" + page + "), pageSize(" + pageSize + ")");
 		String accept = request.getHeader("Accept");
@@ -73,6 +75,7 @@ public class DocumentsApiController {
 	 * POST /documents
 	 */
 	@PostMapping("/documents")
+	@RolesAllowed(value = { "REDACTEUR" })
     public ResponseEntity<DocumentsList> documentsPost(@Valid @RequestBody Document body) {
 		log.info("POST /documents : documentsPost called with document body '" + body + "'");
         String accept = request.getHeader("Accept");
@@ -98,6 +101,7 @@ public class DocumentsApiController {
 	 * GET /documents/{documentId}
 	 */
 	@GetMapping("/documents/{documentId}")
+	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
     public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") Integer documentId) {
     	log.info("GET /documents/{documentId} : documentsDocumentIdGet called with document id '" + documentId + "'");
         String accept = request.getHeader("Accept");
@@ -123,6 +127,7 @@ public class DocumentsApiController {
 	 * PUT /documents/{documentId}
 	 */
 	@PutMapping("/documents/{documentId}")
+	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
     public ResponseEntity<Document> documentsDocumentIdPut(@PathVariable("documentId") Integer documentId, @Valid @RequestBody Document body) {
     	log.info("PUT /documents/{documentId} : documentsDocumentIdPut called with document id '" + documentId + "' and body '" + body + "'");
         String accept = request.getHeader("Accept");
@@ -151,6 +156,7 @@ public class DocumentsApiController {
      * PUT /documents/{documentId}/status:
      */
 	@PutMapping("/documents/{documentId}/status")
+	@RolesAllowed(value = { "RELECTEUR" })
     public ResponseEntity<Void> documentsDocumentIdStatusPut(@PathVariable("documentId") Integer documentId, @Valid @RequestBody String body) {
     	log.info("PUT /documents/{documentId}/status : documentsDocumentIdStatusPut called with document id '" + documentId + "' and body '" + body + "'");
         String accept = request.getHeader("Accept");
@@ -178,6 +184,7 @@ public class DocumentsApiController {
      * GET /documents/{documentId}/lock
      */
 	@GetMapping("/documents/{documentId}/lock")
+	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
     public ResponseEntity<Lock> documentsDocumentIdLockGet( @PathVariable("documentId") Integer documentId) {
     	log.info("GET /documents/{documentId}/lock : documentsDocumentIdLockGet called with document id '" + documentId + "'");
         String accept = request.getHeader("Accept");
@@ -203,6 +210,7 @@ public class DocumentsApiController {
      * PUT /documents/{documentId}/lock
      */
 	@PutMapping("/documents/{documentId}/lock")
+	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
     public ResponseEntity<Lock> documentsDocumentIdLockPut(@PathVariable("documentId") Integer documentId) {
         String accept = request.getHeader("Accept");
         log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockPut called with document id '" + documentId + "'");
@@ -232,6 +240,7 @@ public class DocumentsApiController {
      * DELETE /documents/{documentId}/lock
      */
 	@DeleteMapping("/documents/{documentId}/lock")
+	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
     public ResponseEntity<Void> documentsDocumentIdLockDelete(@PathVariable("documentId") Integer documentId) {
     	String accept = request.getHeader("Accept");
         log.info("DELETE /documents/{documentId}/lock : documentsDocumentIdLockDelete called with document id '" + documentId + "'");
