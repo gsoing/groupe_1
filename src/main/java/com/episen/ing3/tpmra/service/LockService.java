@@ -32,7 +32,13 @@ public class LockService {
 		return null;
 	}
 
-	public Boolean deleteDocumentLock(Integer documentId) {
+	public Boolean deleteDocumentLock(Integer documentId, String userName) {
+		Optional<Lock> lock = lockRepository.findById(documentId);
+		if(lock.isPresent()) {
+			if(!lock.get().getOwner().equals(userName))
+				return null; 
+		}
+
 		lockRepository.deleteById(documentId);
 		if(this.getDocumentLock(documentId).isPresent()) {
 			return false; 

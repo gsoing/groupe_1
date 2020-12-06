@@ -1,4 +1,5 @@
 package com.episen.ing3.tpmra.service;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +14,9 @@ import com.episen.ing3.tpmra.model.Document;
 import com.episen.ing3.tpmra.model.Document.StatusEnum;
 import com.episen.ing3.tpmra.model.DocumentSummary;
 import com.episen.ing3.tpmra.model.DocumentsList;
+import com.episen.ing3.tpmra.model.Lock;
 import com.episen.ing3.tpmra.repository.DocumentRepository;
+import com.episen.ing3.tpmra.repository.LockRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,6 +26,8 @@ public class DocumentService {
 
 	@Autowired
 	DocumentRepository documentRepository;
+	@Autowired
+	LockRepository lockRepository;
 
 	public DocumentsList getAllDocuments(@Valid Integer page, @Valid Integer pageSize) {
 		Page<Document> pageDocuments = documentRepository.findAll(PageRequest.of(page, pageSize));
@@ -35,7 +40,13 @@ public class DocumentService {
 		return list;
 	}
 
-	public DocumentsList createDocument(@Valid Document body) {
+	public DocumentsList createDocument(@Valid Document body, String userName) {
+		body.setStatus(StatusEnum.CREATED);
+		OffsetDateTime dateTime = OffsetDateTime.now();
+		body.setCreated(dateTime);
+		body.setUpdated(dateTime);
+		body.setCreator(userName);
+		body.setEditor(userName);
 		Document documentCreated = documentRepository.save(body);
 		DocumentsList list = new DocumentsList(0,1);
 		list.addDataItem(new DocumentSummary(documentCreated.getDocumentId(), documentCreated.getCreated(), documentCreated.getUpdated(), documentCreated.getTitle()));
@@ -47,7 +58,18 @@ public class DocumentService {
 
 	}
 
-	public Document updateDocument(Document document) {
+	public Document updateDocument(Document document, String userName, boolean relecteur) {
+		Optional<Lock> lock = lockRepository.findById(document.getDocumentId());
+		if(lock.isPresent()) {
+			if(!lock.get().getOwner().equals(userName)) {
+				return null; 
+			}
+		}
+		if(document.getStatus().equals(StatusEnum.VALIDATED) && !relecteur)
+			return null; 
+		OffsetDateTime dateTime = OffsetDateTime.now();
+		document.setUpdated(dateTime);
+		document.setEditor(userName);
 		return documentRepository.save(document);
 	}
 
