@@ -58,7 +58,7 @@ public class DocumentService {
 
 	}
 
-	public Document updateDocument(Document document, String userName, boolean relecteur) {
+	public Document updateDocument(Document document, String userName, Boolean relecteur) {
 		Optional<Lock> lock = lockRepository.findById(document.getDocumentId());
 		if(lock.isPresent()) {
 			if(!lock.get().getOwner().equals(userName)) {
