@@ -48,6 +48,11 @@ public class DocumentsApiController {
 		String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
         	try {
+        		// Control arguments
+        		if(page == null) page=0;
+        		if(pageSize == null || pageSize>=20) {
+        			pageSize=10;
+        		}
         		DocumentsList list = documentService.getAllDocuments(page, pageSize);
         		log.info("GET /documents : returning the following list " + list);
         		if(list==null)

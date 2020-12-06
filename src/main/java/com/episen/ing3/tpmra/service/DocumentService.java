@@ -1,10 +1,11 @@
 package com.episen.ing3.tpmra.service;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -14,17 +15,21 @@ import com.episen.ing3.tpmra.model.DocumentSummary;
 import com.episen.ing3.tpmra.model.DocumentsList;
 import com.episen.ing3.tpmra.repository.DocumentRepository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class DocumentService {
 
 	@Autowired
 	DocumentRepository documentRepository;
 
 	public DocumentsList getAllDocuments(@Valid Integer page, @Valid Integer pageSize) {
-		@SuppressWarnings("unchecked")
-		ArrayList<Document> listDocument = (ArrayList<Document>) documentRepository.findAll(PageRequest.of(page, pageSize));
-		DocumentsList list = new DocumentsList();
-		for(Document document: listDocument) {
+		Page<Document> pageDocuments = documentRepository.findAll(PageRequest.of(page, pageSize));
+		log.info(">>DEBUG : Number of elements : " + pageDocuments.getSize());
+		List<Document> listDocuments = pageDocuments.getContent();
+		DocumentsList list = new DocumentsList(page,pageSize);
+		for(Document document: listDocuments) {
 			list.addDataItem(new DocumentSummary(document.getDocumentId(), document.getCreated(), document.getUpdated(), document.getTitle()));
 		}
 		return list;
@@ -32,7 +37,7 @@ public class DocumentService {
 
 	public DocumentsList createDocument(@Valid Document body) {
 		Document documentCreated = documentRepository.save(body);
-		DocumentsList list = new DocumentsList();
+		DocumentsList list = new DocumentsList(0,1);
 		list.addDataItem(new DocumentSummary(documentCreated.getDocumentId(), documentCreated.getCreated(), documentCreated.getUpdated(), documentCreated.getTitle()));
 		return list;
 	}
