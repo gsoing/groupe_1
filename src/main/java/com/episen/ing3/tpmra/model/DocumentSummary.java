@@ -1,11 +1,10 @@
 package com.episen.ing3.tpmra.model;
 
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-
-import org.threeten.bp.OffsetDateTime;
 
 @MappedSuperclass
 public class DocumentSummary   {

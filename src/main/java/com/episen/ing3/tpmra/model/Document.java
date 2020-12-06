@@ -1,10 +1,9 @@
 package com.episen.ing3.tpmra.model;
 
+import java.time.OffsetDateTime;
 import java.util.Objects;
 
 import javax.persistence.Entity;
-
-import org.threeten.bp.OffsetDateTime;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -19,16 +18,16 @@ public class Document extends DocumentSummary  {
 
   private String body;
 
-  public Document(@JsonProperty("documentId") String documentId,@JsonProperty("created") OffsetDateTime created, @JsonProperty("updated") OffsetDateTime updated, @JsonProperty("title") String title, @JsonProperty("creator") String creator, @JsonProperty("editor") String editor, @JsonProperty("body") String body) {
+  public Document(@JsonProperty("documentId") String documentId, @JsonProperty("created") OffsetDateTime created, @JsonProperty("updated") OffsetDateTime updated, @JsonProperty("title") String title, @JsonProperty("creator") String creator, @JsonProperty("editor") String editor, @JsonProperty("body") String body) {
 		super(documentId, created, updated, title);
 		this.creator=creator;
 		this.editor=editor;
 		this.body=body;
 	}
-  
-  public Document(@JsonProperty("documentId") String documentId,@JsonProperty("created") OffsetDateTime created, @JsonProperty("updated") OffsetDateTime updated, @JsonProperty("title") String title) {
+  /*
+  public Document(@JsonProperty("documentId") String documentId,@JsonProperty("created") @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ") OffsetDateTime created, @JsonProperty("updated") @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd@HH:mm:ss.SSSZ") OffsetDateTime updated, @JsonProperty("title") String title) {
 		super(documentId, created, updated, title);
-	}
+	}*/
 
   public enum StatusEnum {
     CREATED("CREATED"),
@@ -72,11 +71,6 @@ public class Document extends DocumentSummary  {
   public void setCreator(String creator) {
     this.creator = creator;
   }
-
-  public Document editor(String editor) {
-    this.editor = editor;
-    return this;
-  }
   
     public String getEditor() {
     return editor;
@@ -84,11 +78,6 @@ public class Document extends DocumentSummary  {
 
   public void setEditor(String editor) {
     this.editor = editor;
-  }
-
-  public Document body(String body) {
-    this.body = body;
-    return this;
   }
   
     public String getBody() {
@@ -98,12 +87,7 @@ public class Document extends DocumentSummary  {
   public void setBody(String body) {
     this.body = body;
   }
-
-  public Document status(StatusEnum status) {
-    this.status = status;
-    return this;
-  }
-
+  
     public StatusEnum getStatus() {
     return status;
   }
