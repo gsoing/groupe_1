@@ -13,13 +13,20 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @Entity
 public class Document extends DocumentSummary  {
 
-  private String creator = null;
+  private String creator;
 
-  private String editor = null;
+  private String editor;
 
-  private String body = null;
+  private String body;
 
-  public Document(String documentId, OffsetDateTime created, OffsetDateTime updated, String title) {
+  public Document(@JsonProperty("documentId") String documentId,@JsonProperty("created") OffsetDateTime created, @JsonProperty("updated") OffsetDateTime updated, @JsonProperty("title") String title, @JsonProperty("creator") String creator, @JsonProperty("editor") String editor, @JsonProperty("body") String body) {
+		super(documentId, created, updated, title);
+		this.creator=creator;
+		this.editor=editor;
+		this.body=body;
+	}
+  
+  public Document(@JsonProperty("documentId") String documentId,@JsonProperty("created") OffsetDateTime created, @JsonProperty("updated") OffsetDateTime updated, @JsonProperty("title") String title) {
 		super(documentId, created, updated, title);
 	}
 
