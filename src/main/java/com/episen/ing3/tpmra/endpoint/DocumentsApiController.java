@@ -1,5 +1,6 @@
 package com.episen.ing3.tpmra.endpoint;
 
+import java.security.Principal;
 import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
@@ -9,6 +10,8 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,12 +79,12 @@ public class DocumentsApiController {
 	 */
 	@PostMapping("/documents")
 	@RolesAllowed(value = { "REDACTEUR" })
-    public ResponseEntity<DocumentsList> documentsPost(@Valid @RequestBody Document body) {
+    public ResponseEntity<DocumentsList> documentsPost(Principal principal, @Valid @RequestBody Document body) {
 		log.info("POST /documents : documentsPost called with document body '" + body + "'");
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-            	DocumentsList list = documentService.createDocument(body);
+            	DocumentsList list = documentService.createDocument(body,principal.getName());
             	log.info("POST /documents : returning the following list " + list);
             	if(list==null)
         			return new ResponseEntity<DocumentsList>(HttpStatus.BAD_REQUEST);
@@ -128,15 +131,21 @@ public class DocumentsApiController {
 	 */
 	@PutMapping("/documents/{documentId}")
 	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
-    public ResponseEntity<Document> documentsDocumentIdPut(@PathVariable("documentId") Integer documentId, @Valid @RequestBody Document body) {
+    public ResponseEntity<Document> documentsDocumentIdPut(Principal principal, @PathVariable("documentId") Integer documentId, @Valid @RequestBody Document body) {
     	log.info("PUT /documents/{documentId} : documentsDocumentIdPut called with document id '" + documentId + "' and body '" + body + "'");
+    	/* Checking if its role is RELECTEUR */
+		Boolean relecteur = false;
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("RELECTEUR")))
+		    relecteur=true;
+		/* Main treatment */
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
             	if(!documentId.equals(body.getDocumentId())) {
             		return new ResponseEntity<Document>(HttpStatus.BAD_REQUEST); 
             	}
-            	Document document = documentService.updateDocument(body);
+            	Document document = documentService.updateDocument(body,principal.getName(),relecteur);
             	log.info("PUT /documents/{documentId} : returning the following document: " + document);
             	if(document==null)
         			return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
@@ -211,16 +220,12 @@ public class DocumentsApiController {
      */
 	@PutMapping("/documents/{documentId}/lock")
 	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
-    public ResponseEntity<Lock> documentsDocumentIdLockPut(@PathVariable("documentId") Integer documentId) {
+    public ResponseEntity<Lock> documentsDocumentIdLockPut(Principal principal, @PathVariable("documentId") Integer documentId) {
         String accept = request.getHeader("Accept");
         log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockPut called with document id '" + documentId + "'");
         if (accept != null && accept.contains("application/json")) {
         	try {
-        		/*
-        		 * TODO retrieve owner info
-        		 */
-        		String owner = null;
-            	Lock lock = lockService.putDocumentLock(documentId, owner);
+            	Lock lock = lockService.putDocumentLock(documentId, principal.getName());
             	log.info("PUT /documents/{documentId}/lock : returning the following document: " + lock);
             	if(lock==null)
         			return new ResponseEntity<Lock>(HttpStatus.NOT_FOUND);
@@ -241,12 +246,12 @@ public class DocumentsApiController {
      */
 	@DeleteMapping("/documents/{documentId}/lock")
 	@RolesAllowed(value = { "REDACTEUR","RELECTEUR" })
-    public ResponseEntity<Void> documentsDocumentIdLockDelete(@PathVariable("documentId") Integer documentId) {
+    public ResponseEntity<Void> documentsDocumentIdLockDelete(Principal principal, @PathVariable("documentId") Integer documentId) {
     	String accept = request.getHeader("Accept");
         log.info("DELETE /documents/{documentId}/lock : documentsDocumentIdLockDelete called with document id '" + documentId + "'");
         if (accept != null && accept.contains("application/json")) {
         	try {
-            	Boolean result = lockService.deleteDocumentLock(documentId);
+            	Boolean result = lockService.deleteDocumentLock(documentId, principal.getName());
             	log.info("DELETE /documents/{documentId}/lock : Did the delete succeed? " + result);
             	if(!result)
         			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
