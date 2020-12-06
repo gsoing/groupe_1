@@ -206,7 +206,11 @@ public class DocumentsApiController {
         log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockPut called with document id '" + documentId + "'");
         if (accept != null && accept.contains("application/json")) {
         	try {
-            	Lock lock = lockService.putDocumentLock(documentId);
+        		/*
+        		 * TODO retrieve owner info
+        		 */
+        		String owner = null;
+            	Lock lock = lockService.putDocumentLock(documentId, owner);
             	log.info("PUT /documents/{documentId}/lock : returning the following document: " + lock);
             	if(lock==null)
         			return new ResponseEntity<Lock>(HttpStatus.NOT_FOUND);
@@ -233,7 +237,7 @@ public class DocumentsApiController {
         	try {
             	Boolean result = lockService.deleteDocumentLock(documentId);
             	log.info("DELETE /documents/{documentId}/lock : Did the delete succeed? " + result);
-            	if(result)
+            	if(!result)
         			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         		else
         			return new ResponseEntity<>(HttpStatus.NO_CONTENT);

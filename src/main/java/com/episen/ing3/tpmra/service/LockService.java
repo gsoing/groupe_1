@@ -23,14 +23,13 @@ public class LockService {
 
 	}
 
-	public Lock putDocumentLock(Integer documentId) {
+	public Lock putDocumentLock(Integer documentId, String owner) {
 		if(documentRepository.findById(documentId).isPresent()) {
 			OffsetDateTime dateTime = OffsetDateTime.now();
-			Lock lock = new Lock(documentId, null, dateTime);
+			Lock lock = new Lock(documentId, owner, dateTime);
 			return lockRepository.save(lock);
 		}
 		return null;
-
 	}
 
 	public Boolean deleteDocumentLock(Integer documentId) {

@@ -3,25 +3,31 @@ package com.episen.ing3.tpmra.model;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name="Lock")
+@NoArgsConstructor
 public class Lock   {
 
 	@Id
-	private Integer documentId = null;
+	@Column(name = "documentId")
+	protected Integer documentId;
 
-	private String owner = null;
+	@Column(name = "owner")
+	protected String owner;
 
-	private OffsetDateTime created = null;
+	@Column(name = "created")
+	protected OffsetDateTime created;
 
 	public Lock(@JsonProperty("documentId") Integer documentId, @JsonProperty("owner") String owner, @JsonProperty("created") OffsetDateTime created) {
-		super();
 		this.documentId = documentId;
 		this.owner = owner;
 		this.created = created;
