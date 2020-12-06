@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -131,8 +132,9 @@ public class DocumentsApiController {
 	 */
 	@PutMapping("/documents/{documentId}")
 	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
-	public ResponseEntity<Document> documentsDocumentIdPut(Principal principal, @PathVariable("documentId") Integer documentId, @Valid @RequestBody Document body) {
+	public ResponseEntity<Document> documentsDocumentIdPut(Principal principal, @RequestHeader(value = "ETag", defaultValue = "-1") Integer versionETag, @PathVariable("documentId") Integer documentId, @Valid @RequestBody Document body) {
 		log.info("PUT /documents/{documentId} : documentsDocumentIdPut called with document id '" + documentId + "' and body '" + body + "'");
+		log.info("Version received : " + versionETag);
 		/* Checking if its role is ROLE_RELECTEUR */
 		Boolean relecteur = false;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
