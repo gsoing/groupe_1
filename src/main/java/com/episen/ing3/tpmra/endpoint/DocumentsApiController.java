@@ -105,7 +105,7 @@ public class DocumentsApiController {
             try {
             	Optional<Document> optionalDocument = documentService.getSingleDocument(documentId);
             	log.info("GET /documents/{documentId} : is the document present? " + optionalDocument.isPresent());
-            	if(optionalDocument.isPresent())
+            	if(!optionalDocument.isPresent())
         			return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
         		else
         			return new ResponseEntity<Document>(optionalDocument.get(),HttpStatus.OK);
