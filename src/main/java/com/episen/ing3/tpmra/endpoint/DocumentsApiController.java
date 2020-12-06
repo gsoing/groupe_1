@@ -98,7 +98,7 @@ public class DocumentsApiController {
 	 * GET /documents/{documentId}
 	 */
 	@GetMapping("/documents/{documentId}")
-    public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") String documentId) {
+    public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") Integer documentId) {
     	log.info("GET /documents/{documentId} : documentsDocumentIdGet called with document id '" + documentId + "'");
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {

@@ -42,8 +42,8 @@ public class DocumentService {
 		return list;
 	}
 
-	public Optional<Document> getSingleDocument(String documentId) {
-		return documentRepository.findById(documentId);
+	public Optional<Document> getSingleDocument(Integer documentId) {
+		return documentRepository.findById(documentId.toString());
 
 	}
 
