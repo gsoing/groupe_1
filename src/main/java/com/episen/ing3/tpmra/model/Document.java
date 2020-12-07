@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public class Document extends DocumentSummary  {
 	
 	@Version
+	@JsonIgnore 
 	private Integer version;
 
 	@Column(name = "creator")
@@ -150,5 +152,9 @@ public class Document extends DocumentSummary  {
 			return "null";
 		}
 		return o.toString().replace("\n", "\n    ");
+	}
+
+	public String getVersion() {
+		return String.valueOf(version);
 	}
 }

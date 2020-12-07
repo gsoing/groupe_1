@@ -1,13 +1,16 @@
 package com.episen.ing3.tpmra.service;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import javax.persistence.OptimisticLockException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.episen.ing3.tpmra.model.Document;
@@ -18,10 +21,7 @@ import com.episen.ing3.tpmra.model.Lock;
 import com.episen.ing3.tpmra.repository.DocumentRepository;
 import com.episen.ing3.tpmra.repository.LockRepository;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Service
-@Slf4j
 public class DocumentService {
 
 	@Autowired
@@ -31,7 +31,6 @@ public class DocumentService {
 
 	public DocumentsList getAllDocuments(@Valid Integer page, @Valid Integer pageSize) {
 		Page<Document> pageDocuments = documentRepository.findAll(PageRequest.of(page, pageSize));
-		log.info(">>DEBUG : Number of elements : " + pageDocuments.getSize());
 		List<Document> listDocuments = pageDocuments.getContent();
 		DocumentsList list = new DocumentsList(page,pageSize);
 		for(Document document: listDocuments) {
@@ -53,21 +52,27 @@ public class DocumentService {
 		return list;
 	}
 
-	public Optional<Document> getSingleDocument(Integer documentId) {
-		return documentRepository.findById(documentId);
-
+	public Document getSingleDocument(Integer documentId) {
+		Optional<Document> document = documentRepository.findById(documentId);
+		if(!document.isPresent()) throw new NoSuchElementException();
+		return document.get();
 	}
 
-	public Document updateDocument(Integer documentId, Document document, String userName, Boolean relecteur) {
-		Optional<Lock> lock = lockRepository.findById(documentId);
-		if(lock.isPresent()) {
-			if(!lock.get().getOwner().equals(userName)) {
-				return null; 
-			}
-		}
+	public Document updateDocument(Integer documentId, Document document, String versionETag, String userName, Boolean isRelecteur) {
+		/* Checking if exists */
 		Optional<Document> currentDoc = documentRepository.findById(documentId);
-		if(!currentDoc.isPresent() || (currentDoc.get().getStatus().equals(StatusEnum.VALIDATED) && !relecteur))
-			return null; 
+		if(!currentDoc.isPresent())
+			throw new NoSuchElementException();
+		/* Checking pessimist lock */
+		Optional<Lock> lock = lockRepository.findById(documentId);
+		if(lock.isPresent() && !lock.get().getOwner().equals(userName))
+			throw new AccessDeniedException("A lock was put by another user"); 
+		/* Checking optimist lock */
+		if(!currentDoc.get().getVersion().equals(versionETag))
+			throw new OptimisticLockException();
+		/* Checking permission if doc is validated */
+		if(currentDoc.get().getStatus().equals(StatusEnum.VALIDATED) && !isRelecteur)
+			throw new AccessDeniedException("The doc is in 'validate' state and can only be modify by relecteur");  
 		OffsetDateTime dateTime = OffsetDateTime.now();
 		currentDoc.get().setUpdated(dateTime);
 		currentDoc.get().setEditor(userName);
@@ -83,7 +88,7 @@ public class DocumentService {
 			//documentRepository.deleteById(documentId);
 			return documentRepository.save(doc.get());
 		}
-		return null;
+		else throw new NoSuchElementException();
 	}
 
 

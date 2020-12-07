@@ -1,14 +1,17 @@
 package com.episen.ing3.tpmra.endpoint;
 
 import java.security.Principal;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
+import javax.persistence.OptimisticLockException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -49,22 +52,20 @@ public class DocumentsApiController {
 	 */
 	@GetMapping("/documents")
 	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
-	public ResponseEntity<DocumentsList> documentsGet(@Valid @RequestParam(value = "page", required = false) Integer page, @Valid @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+	public ResponseEntity<DocumentsList> documentsGet(@Valid @RequestParam(value = "page", required = false, defaultValue="0") Integer page, @Valid @RequestParam(value = "pageSize", required = false, defaultValue="10") Integer pageSize) {
 		log.info("GET /documents : documentsGet called with values page (" + page + "), pageSize(" + pageSize + ")");
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
-				// Control arguments
-				if(page == null) page=0;
-				if(pageSize == null || pageSize>=20) {
-					pageSize=10;
-				}
+				/* Main Treatment */
+				if(page<0 || pageSize <=0 || pageSize>20) throw new IllegalArgumentException();
 				DocumentsList list = documentService.getAllDocuments(page, pageSize);
 				log.info("GET /documents : returning the following list " + list);
-				if(list==null)
-					return new ResponseEntity<DocumentsList>(HttpStatus.NOT_FOUND);
-				else
-					return new ResponseEntity<DocumentsList>(list,HttpStatus.OK);
+				return new ResponseEntity<DocumentsList>(list,HttpStatus.OK);
+				/* Error Treatment */
+			}catch(IllegalArgumentException e) {
+				log.error("GET /documents : Illegal values on page/pageSize " + e.getMessage());
+				return new ResponseEntity<DocumentsList>(HttpStatus.BAD_REQUEST);
 			}catch(Exception e) { 
 				log.error("GET /documents : An error occured " + e.getMessage());
 				e.printStackTrace();
@@ -85,12 +86,11 @@ public class DocumentsApiController {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
+				/* Main Treatment */
 				DocumentsList list = documentService.createDocument(body,principal.getName());
 				log.info("POST /documents : returning the following list " + list);
-				if(list==null)
-					return new ResponseEntity<DocumentsList>(HttpStatus.BAD_REQUEST);
-				else
-					return new ResponseEntity<DocumentsList>(list,HttpStatus.CREATED);
+				return new ResponseEntity<DocumentsList>(list,HttpStatus.CREATED);
+				/* Error Treatment */
 			} catch (Exception e) {
 				log.error("POST /documents : An error occured " + e.getMessage());
 				e.printStackTrace();
@@ -106,17 +106,24 @@ public class DocumentsApiController {
 	 */
 	@GetMapping("/documents/{documentId}")
 	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
-	public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") Integer documentId) {
+	public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") Integer documentId, final HttpServletResponse response) {
 		log.info("GET /documents/{documentId} : documentsDocumentIdGet called with document id '" + documentId + "'");
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
-				Optional<Document> optionalDocument = documentService.getSingleDocument(documentId);
-				log.info("GET /documents/{documentId} : is the document present? " + optionalDocument.isPresent());
-				if(!optionalDocument.isPresent())
-					return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
-				else
-					return new ResponseEntity<Document>(optionalDocument.get(),HttpStatus.OK);
+				/* Main Treatment */
+				Document document = documentService.getSingleDocument(documentId);
+				// Setting the version number
+				log.info("GET /documents/{documentId} : Sending version '" + document.getVersion() + "'");
+				response.setHeader("ETag", document.getVersion()) ;
+				return new ResponseEntity<Document>(document,HttpStatus.OK);
+				/* Error Treatment */
+			} catch (IllegalArgumentException e ) {
+				log.error("GET /documents/{documentId} : The ID could not be null " + e.getMessage());
+				return new ResponseEntity<Document>(HttpStatus.BAD_REQUEST);
+			} catch (NoSuchElementException e ) {
+				log.error("GET /documents/{documentId} : No object found " + e.getMessage());
+				return new ResponseEntity<Document>(HttpStatus.NOT_FOUND);
 			} catch (Exception e) {
 				log.error("GET /documents/{documentId} : An error occured " + e.getMessage());
 				e.printStackTrace();
@@ -132,24 +139,35 @@ public class DocumentsApiController {
 	 */
 	@PutMapping("/documents/{documentId}")
 	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
-	public ResponseEntity<Document> documentsDocumentIdPut(Principal principal, @RequestHeader(value = "ETag", defaultValue = "-1") Integer versionETag, @PathVariable("documentId") Integer documentId, @Valid @RequestBody Document body) {
+	public ResponseEntity<Document> documentsDocumentIdPut(Principal principal, @RequestHeader(value = "ETag", defaultValue = "-1") String versionETag, @PathVariable("documentId") Integer documentId, @Valid @RequestBody Document body) {
 		log.info("PUT /documents/{documentId} : documentsDocumentIdPut called with document id '" + documentId + "' and body '" + body + "'");
-		log.info("Version received : " + versionETag);
+		log.info("PUT /documents/{documentId} : Version received : " + versionETag);
 		/* Checking if its role is ROLE_RELECTEUR */
-		Boolean relecteur = false;
+		Boolean isRelecteur = false;
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_RELECTEUR")))
-			relecteur=true;
+			isRelecteur=true;
 		/* Main treatment */
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
-				Document document = documentService.updateDocument(documentId, body,principal.getName(),relecteur);
+				/* Main Treatment */
+				Document document = documentService.updateDocument(documentId, body, versionETag, principal.getName(), isRelecteur);
 				log.info("PUT /documents/{documentId} : returning the following document: " + document);
-				if(document==null)
-					return new ResponseEntity<Document>(HttpStatus.UNAUTHORIZED);
-				else
-					return new ResponseEntity<Document>(document,HttpStatus.OK);
+				return new ResponseEntity<Document>(document,HttpStatus.OK);
+				/* Error Treatment */
+			} catch (NoSuchElementException e) {
+				log.error("PUT /documents/{documentId}/status: No object found " + e.getMessage());
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			} catch (IllegalArgumentException e ) {
+				log.error("GET /documents/{documentId} : The ID could not be null " + e.getMessage());
+				return new ResponseEntity<Document>(HttpStatus.BAD_REQUEST);
+			} catch (AccessDeniedException e) {
+				log.error("PUT /documents/{documentId} : Modification denied : " + e.getMessage());
+				return new ResponseEntity<Document>(HttpStatus.UNAUTHORIZED);
+			} catch (OptimisticLockException e) {
+				log.error("PUT /documents/{documentId} : Wrong ETag version provided " + e.getMessage());
+				return new ResponseEntity<Document>(HttpStatus.CONFLICT);
 			} catch (Exception e) {
 				log.error("PUT /documents/{documentId} : An error occured " + e.getMessage());
 				e.printStackTrace();
@@ -170,14 +188,19 @@ public class DocumentsApiController {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
+				/* Main Treatment */
 				StatusEnum status = StatusEnum.fromValue(body);
-				if(status==null) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				if(status==null) throw new IllegalArgumentException();
 				Document document = documentService.updateDocumentStatus(documentId, status);
 				log.info("PUT /documents/{documentId}/status : the following document was returned: " + document);
-				if(document==null)
-					return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-				else
-					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				/* Error Treatment */
+			} catch (IllegalArgumentException e) {
+				log.error("PUT /documents/{documentId}/status: Status could not be null " + e.getMessage());
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			} catch (NoSuchElementException e) {
+				log.error("PUT /documents/{documentId}/status: No object found " + e.getMessage());
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			} catch (Exception e) {
 				log.error("PUT /documents/{documentId}/status: An error occured " + e.getMessage());
 				e.printStackTrace();
@@ -198,12 +221,17 @@ public class DocumentsApiController {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
-				Optional<Lock> optionalLock = lockService.getDocumentLock(documentId);
-				log.info("GET /documents/{documentId}/lock : is the lock present? : " + optionalLock.isPresent());
-				if(!optionalLock.isPresent())
-					return new ResponseEntity<Lock>(HttpStatus.NO_CONTENT);
-				else
-					return new ResponseEntity<Lock>(optionalLock.get(),HttpStatus.OK);
+				/* Main Treatment */
+				Lock lock = lockService.getDocumentLock(documentId);
+				log.info("GET /documents/{documentId}/lock : Returning the following lock : " + lock);
+				return new ResponseEntity<Lock>(lock,HttpStatus.OK);
+				/* Error Treatment */
+			} catch (IllegalArgumentException e ) {
+				log.error("GET /documents/{documentId}/lock : The ID could not be null " + e.getMessage());
+				return new ResponseEntity<Lock>(HttpStatus.BAD_REQUEST);
+			} catch (NoSuchElementException e ) {
+				log.error("GET /documents/{documentId}/lock : No object found " + e.getMessage());
+				return new ResponseEntity<Lock>(HttpStatus.NOT_FOUND);
 			} catch (Exception e) {
 				log.error("GET /documents/{documentId}/lock : An error occured " + e.getMessage());
 				e.printStackTrace();
@@ -224,12 +252,20 @@ public class DocumentsApiController {
 		log.info("PUT /documents/{documentId}/lock : documentsDocumentIdLockPut called with document id '" + documentId + "'");
 		if (accept != null && accept.contains("application/json")) {
 			try {
+				/* Main Treatment */
 				Lock lock = lockService.putDocumentLock(documentId, principal.getName());
-				log.info("PUT /documents/{documentId}/lock : returning the following document: " + lock);
-				if(lock==null)
-					return new ResponseEntity<Lock>(HttpStatus.NOT_FOUND);
-				else
-					return new ResponseEntity<Lock>(lock,HttpStatus.OK);
+				log.info("PUT /documents/{documentId}/lock : returning the following lock: " + lock);
+				return new ResponseEntity<Lock>(lock,HttpStatus.OK);
+				/* Error Treatment */
+			} catch (IllegalArgumentException e ) {
+				log.error("PUT /documents/{documentId}/lock : The ID could not be null " + e.getMessage());
+				return new ResponseEntity<Lock>(HttpStatus.BAD_REQUEST);
+			} catch (NoSuchElementException e ) {
+				log.error("PUT /documents/{documentId}/lock : No object found " + e.getMessage());
+				return new ResponseEntity<Lock>(HttpStatus.NOT_FOUND);
+			} catch (AccessDeniedException e) {
+				log.error("DELETE /documents/{documentId}/lock : Access denied : " + e.getMessage());
+				return new ResponseEntity<>(HttpStatus.CONFLICT);
 			} catch (Exception e) {
 				log.error("PUT /documents/{documentId}/lock : An error occured " + e.getMessage());
 				e.printStackTrace();
@@ -250,9 +286,20 @@ public class DocumentsApiController {
 		log.info("DELETE /documents/{documentId}/lock : documentsDocumentIdLockDelete called with document id '" + documentId + "'");
 		if (accept != null && accept.contains("application/json")) {
 			try {
-				HttpStatus result = lockService.deleteDocumentLock(documentId, principal.getName());
-				log.info("DELETE /documents/{documentId}/lock : Did the delete succeed? " + result);
-				return new ResponseEntity<>(result);
+				/* Main Treatment */
+				lockService.deleteDocumentLock(documentId, principal.getName());
+				log.info("DELETE /documents/{documentId}/lock : The delete was successful ");
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				/* Error Treatment */
+			} catch (IllegalArgumentException e ) {
+				log.error("DELETE /documents/{documentId}/lock : The ID could not be null " + e.getMessage());
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			} catch (NoSuchElementException e ) {
+				log.error("DELETE /documents/{documentId}/lock : No object found " + e.getMessage());
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			} catch (AccessDeniedException e) {
+				log.error("DELETE /documents/{documentId}/lock : Access denied : " + e.getMessage());
+				return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 			} catch (Exception e) {
 				log.error("DELETE /documents/{documentId}/lock : An error occured " + e.getMessage());
 				e.printStackTrace();
