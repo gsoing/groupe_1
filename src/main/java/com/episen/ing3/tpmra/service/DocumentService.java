@@ -2,7 +2,6 @@ package com.episen.ing3.tpmra.service;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import javax.persistence.OptimisticLockException;
 import javax.validation.Valid;
@@ -17,7 +16,6 @@ import com.episen.ing3.tpmra.model.Document;
 import com.episen.ing3.tpmra.model.Document.StatusEnum;
 import com.episen.ing3.tpmra.model.DocumentSummary;
 import com.episen.ing3.tpmra.model.DocumentsList;
-import com.episen.ing3.tpmra.model.Lock;
 import com.episen.ing3.tpmra.repository.DocumentRepository;
 import com.episen.ing3.tpmra.repository.LockRepository;
 
@@ -53,42 +51,31 @@ public class DocumentService {
 	}
 
 	public Document getSingleDocument(Integer documentId) {
-		Optional<Document> document = documentRepository.findById(documentId);
-		if(!document.isPresent()) throw new NoSuchElementException();
-		return document.get();
+		return documentRepository.findById(documentId).orElseThrow(() -> new NoSuchElementException());
 	}
 
 	public Document updateDocument(Integer documentId, Document document, String versionETag, String userName, Boolean isRelecteur) {
 		/* Checking if exists */
-		Optional<Document> currentDoc = documentRepository.findById(documentId);
-		if(!currentDoc.isPresent())
-			throw new NoSuchElementException();
+		Document savedDocument = documentRepository.findById(documentId).orElseThrow(() -> new NoSuchElementException());
 		/* Checking pessimist lock */
-		Optional<Lock> lock = lockRepository.findById(documentId);
-		if(lock.isPresent() && !lock.get().getOwner().equals(userName))
-			throw new AccessDeniedException("A lock was put by another user"); 
+		lockRepository.findById(documentId).ifPresent(lock -> { if (!lock.getOwner().equals(versionETag)) throw new AccessDeniedException("A lock was put by another user") ; });;
 		/* Checking optimist lock */
-		if(!currentDoc.get().getVersion().equals(versionETag))
-			throw new OptimisticLockException();
+		if(savedDocument.getVersion().equals(versionETag)) throw new OptimisticLockException();
 		/* Checking permission if doc is validated */
-		if(currentDoc.get().getStatus().equals(StatusEnum.VALIDATED) && !isRelecteur)
+		if(savedDocument.getStatus().equals(StatusEnum.VALIDATED) && !isRelecteur)
 			throw new AccessDeniedException("The doc is in 'validate' state and can only be modify by relecteur");  
 		OffsetDateTime dateTime = OffsetDateTime.now();
-		currentDoc.get().setUpdated(dateTime);
-		currentDoc.get().setEditor(userName);
-		currentDoc.get().setTitle(document.getTitle());
-		currentDoc.get().setBody(document.getBody());
-		return documentRepository.save(currentDoc.get());
+		savedDocument.setUpdated(dateTime);
+		savedDocument.setEditor(userName);
+		savedDocument.setTitle(document.getTitle());
+		savedDocument.setBody(document.getBody());
+		return documentRepository.save(savedDocument);
 	}
 
 	public Document updateDocumentStatus(Integer documentId, StatusEnum status) {
-		Optional<Document> doc= documentRepository.findById(documentId);
-		if(doc.isPresent()) {
-			doc.get().setStatus(status);
-			//documentRepository.deleteById(documentId);
-			return documentRepository.save(doc.get());
-		}
-		else throw new NoSuchElementException();
+		Document document = documentRepository.findById(documentId).orElseThrow(() -> new NoSuchElementException());
+		document.setStatus(status);
+		return documentRepository.save(document);
 	}
 
 

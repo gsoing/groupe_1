@@ -21,14 +21,12 @@ public class LockService {
 	DocumentRepository documentRepository;
 
 	public Lock getDocumentLock(Integer documentId) {
-		Optional<Lock> optionalLock = lockRepository.findById(documentId);
-		if(!optionalLock.isPresent()) throw new NoSuchElementException();
-		return optionalLock.get();
-
+		Lock lock = lockRepository.findById(documentId).orElseThrow(() -> new NoSuchElementException());
+		return lock;
 	}
 
 	public Lock putDocumentLock(Integer documentId, String owner) {
-		if(lockRepository.findById(documentId).isPresent()) throw new AccessDeniedException("A lock is already put");
+		lockRepository.findById(documentId).ifPresent(lock -> {throw new AccessDeniedException("A lock is already put : " + lock); });
 		if(documentRepository.findById(documentId).isPresent()) {
 			OffsetDateTime dateTime = OffsetDateTime.now();
 			Lock lock = new Lock(documentId, owner, dateTime);
@@ -38,11 +36,10 @@ public class LockService {
 	}
 
 	public void deleteDocumentLock(Integer documentId, String userName) {
-		Optional<Lock> lock = lockRepository.findById(documentId);
-		if(lock.isPresent()) {
-			if(lock.get().getOwner().equals(userName)) lockRepository.deleteById(documentId);
-			else throw new AccessDeniedException("The lock was put by another user");
-		}
-		else throw new NoSuchElementException();
+		Lock lock = lockRepository.findById(documentId).orElseThrow(() -> new NoSuchElementException());
+		if(lock.getOwner().equals(userName)) 
+			lockRepository.deleteById(documentId);
+		else
+			new AccessDeniedException("The lock was put by another user");
 	}
 }

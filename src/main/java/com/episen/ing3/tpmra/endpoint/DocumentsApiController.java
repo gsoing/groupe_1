@@ -61,7 +61,9 @@ public class DocumentsApiController {
 				if(page<0 || pageSize <=0 || pageSize>20) throw new IllegalArgumentException();
 				DocumentsList list = documentService.getAllDocuments(page, pageSize);
 				log.info("GET /documents : returning the following list " + list);
-				return new ResponseEntity<DocumentsList>(list,HttpStatus.OK);
+		        return ResponseEntity
+		                .status(HttpStatus.OK)
+		                .body(list);
 				/* Error Treatment */
 			}catch(IllegalArgumentException e) {
 				log.error("GET /documents : Illegal values on page/pageSize " + e.getMessage());
@@ -89,7 +91,9 @@ public class DocumentsApiController {
 				/* Main Treatment */
 				DocumentsList list = documentService.createDocument(body,principal.getName());
 				log.info("POST /documents : returning the following list " + list);
-				return new ResponseEntity<DocumentsList>(list,HttpStatus.CREATED);
+		        return ResponseEntity
+		                .status(HttpStatus.CREATED)
+		                .body(list);
 				/* Error Treatment */
 			} catch (Exception e) {
 				log.error("POST /documents : An error occured " + e.getMessage());
@@ -106,17 +110,18 @@ public class DocumentsApiController {
 	 */
 	@GetMapping("/documents/{documentId}")
 	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
-	public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") Integer documentId, final HttpServletResponse response) {
+	public ResponseEntity<Document> documentsDocumentIdGet(@PathVariable("documentId") Integer documentId) {
 		log.info("GET /documents/{documentId} : documentsDocumentIdGet called with document id '" + documentId + "'");
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			try {
 				/* Main Treatment */
 				Document document = documentService.getSingleDocument(documentId);
-				// Setting the version number
 				log.info("GET /documents/{documentId} : Sending version '" + document.getVersion() + "'");
-				response.setHeader("ETag", document.getVersion()) ;
-				return new ResponseEntity<Document>(document,HttpStatus.OK);
+		        return ResponseEntity
+		                .status(HttpStatus.OK)
+		                .eTag(document.getVersion())
+		                .body(document);
 				/* Error Treatment */
 			} catch (IllegalArgumentException e ) {
 				log.error("GET /documents/{documentId} : The ID could not be null " + e.getMessage());
@@ -154,7 +159,10 @@ public class DocumentsApiController {
 				/* Main Treatment */
 				Document document = documentService.updateDocument(documentId, body, versionETag, principal.getName(), isRelecteur);
 				log.info("PUT /documents/{documentId} : returning the following document: " + document);
-				return new ResponseEntity<Document>(document,HttpStatus.OK);
+		        return ResponseEntity
+		                .status(HttpStatus.OK)
+		                .eTag(document.getVersion())
+		                .body(document);
 				/* Error Treatment */
 			} catch (NoSuchElementException e) {
 				log.error("PUT /documents/{documentId}/status: No object found " + e.getMessage());
@@ -224,7 +232,9 @@ public class DocumentsApiController {
 				/* Main Treatment */
 				Lock lock = lockService.getDocumentLock(documentId);
 				log.info("GET /documents/{documentId}/lock : Returning the following lock : " + lock);
-				return new ResponseEntity<Lock>(lock,HttpStatus.OK);
+		        return ResponseEntity
+		                .status(HttpStatus.OK)
+		                .body(lock);
 				/* Error Treatment */
 			} catch (IllegalArgumentException e ) {
 				log.error("GET /documents/{documentId}/lock : The ID could not be null " + e.getMessage());
@@ -255,7 +265,9 @@ public class DocumentsApiController {
 				/* Main Treatment */
 				Lock lock = lockService.putDocumentLock(documentId, principal.getName());
 				log.info("PUT /documents/{documentId}/lock : returning the following lock: " + lock);
-				return new ResponseEntity<Lock>(lock,HttpStatus.OK);
+		        return ResponseEntity
+		                .status(HttpStatus.OK)
+		                .body(lock);
 				/* Error Treatment */
 			} catch (IllegalArgumentException e ) {
 				log.error("PUT /documents/{documentId}/lock : The ID could not be null " + e.getMessage());
