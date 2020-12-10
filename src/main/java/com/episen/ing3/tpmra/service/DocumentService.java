@@ -60,9 +60,9 @@ public class DocumentService {
 		/* Checking if exists */
 		Document savedDocument = documentRepository.findById(documentId).orElseThrow(() -> NotFoundException.DEFAULT);
 		/* Checking pessimist lock */
-		lockRepository.findById(documentId).ifPresent(lock -> { if (!lock.getOwner().equals(versionETag)) throw ForbiddenException.DEFAULT ; });;
+		lockRepository.findById(documentId).ifPresent(lock -> { if (!lock.getOwner().equals(userName)) throw ForbiddenException.DEFAULT ; });;
 		/* Checking optimist lock */
-		if(savedDocument.getVersion().equals(versionETag)) throw ConflictException.DEFAULT;
+		if(!savedDocument.getVersion().equals(versionETag)) throw ConflictException.DEFAULT;
 		/* Checking permission if doc is validated */
 		if(savedDocument.getStatus().equals(StatusEnum.VALIDATED) && !isRelecteur) throw ForbiddenException.DEFAULT;
 		OffsetDateTime dateTime = OffsetDateTime.now();
