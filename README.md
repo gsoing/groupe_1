@@ -1,6 +1,6 @@
-# TP 2 MRA - Aguesse Justin, Jacquet Pierre
+# TP 2 MRA
 
-TP2 MRA
+TP2 MRA, rendu de Aguesse Justin, Jacquet Pierre
 
 ## Installation
 
@@ -17,6 +17,7 @@ Une collection Postman a été rajoutée au projet afin de pouvoir faciliter les
 Le mécanisme de Lock positive utilise le HEADER eTag :
 Il est renseigné dans le header retour d'un GET sur un document, dans le header retour d'un PUT sur un document. 
 Il doit être renseigné dans header envoyé d'une requête PUT sur un document
+Les heures sont en UTC.
 
 ## Authentification
 

@@ -15,8 +15,8 @@ public class BadRequestException extends AbstractDocumentException {
     private BadRequestException() {
         super(HttpStatus.BAD_REQUEST,
                 ErrorMessage.builder()
-                        .code(BAD_REQUEST_CODE)
-                        .message(BAS_REQUEST_MESSAGE)
+                        .errorCode(BAD_REQUEST_CODE)
+                        .errorMessage(BAS_REQUEST_MESSAGE)
                         .build());
     }
 }

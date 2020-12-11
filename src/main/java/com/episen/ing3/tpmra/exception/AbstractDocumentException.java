@@ -14,7 +14,7 @@ public class AbstractDocumentException extends RuntimeException {
     private final HttpStatus httpStatus;
 
     public AbstractDocumentException(HttpStatus httpStatus, ErrorMessage errorMessage) {
-        super(errorMessage.getMessage());
+        super(errorMessage.getErrorMessage());
         this.errorMessage = errorMessage;
         this.httpStatus = httpStatus;
     }

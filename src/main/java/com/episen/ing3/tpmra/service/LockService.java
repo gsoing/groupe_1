@@ -1,6 +1,7 @@
 package com.episen.ing3.tpmra.service;
 
 import java.time.OffsetDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,8 @@ public class LockService {
 	@Autowired
 	DocumentRepository documentRepository;
 
-	public Lock getDocumentLock(Integer documentId) {
-		Lock lock = lockRepository.findById(documentId).orElseThrow(() -> NotFoundException.DEFAULT);
-		return lock;
+	public Optional<Lock> getDocumentLock(Integer documentId) {
+		return lockRepository.findById(documentId);
 	}
 
 	public Lock putDocumentLock(Integer documentId, String owner) {

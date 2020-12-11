@@ -13,7 +13,7 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class ErrorMessage implements Serializable {
 
-    private String code;
-    private String message;
+    private String errorCode;
+    private String errorMessage;
 
 }

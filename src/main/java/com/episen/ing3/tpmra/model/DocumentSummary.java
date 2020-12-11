@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @MappedSuperclass
 public class DocumentSummary   {
 	
@@ -18,9 +20,11 @@ public class DocumentSummary   {
 	protected Integer documentId = null;
 
 	@Column(name = "created")
+	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SS'Z'")
 	protected OffsetDateTime created = null;
 
 	@Column(name = "updated")
+	@JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss.SS'Z'")
 	protected OffsetDateTime updated = null;
 
 	@Column(name = "title")
@@ -49,12 +53,7 @@ public class DocumentSummary   {
 	public void setDocumentId(Integer documentId) {
 		this.documentId = documentId;
 	}
-
-	public DocumentSummary created(OffsetDateTime created) {
-		this.created = created;
-		return this;
-	}
-
+	
 	public OffsetDateTime getCreated() {
 		return created;
 	}
@@ -63,10 +62,6 @@ public class DocumentSummary   {
 		this.created = created;
 	}
 
-	public DocumentSummary updated(OffsetDateTime updated) {
-		this.updated = updated;
-		return this;
-	}
 	
 	public OffsetDateTime getUpdated() {
 		return updated;
@@ -74,11 +69,6 @@ public class DocumentSummary   {
 
 	public void setUpdated(OffsetDateTime updated) {
 		this.updated = updated;
-	}
-
-	public DocumentSummary title(String title) {
-		this.title = title;
-		return this;
 	}
 
 	public String getTitle() {

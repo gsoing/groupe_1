@@ -1,6 +1,7 @@
 package com.episen.ing3.tpmra.endpoint;
 
 import java.security.Principal;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -164,11 +165,12 @@ public class DocumentsApiController {
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			/* Main Treatment */
-			Lock lock = lockService.getDocumentLock(documentId);
-			log.info("GET /documents/{documentId}/lock : Returning the following lock : " + lock);
-			return ResponseEntity
-					.status(HttpStatus.OK)
-					.body(lock);
+			Optional<Lock> optionalLock = lockService.getDocumentLock(documentId);
+			log.info("GET /documents/{documentId}/lock : Is the lock present? : " + optionalLock.isPresent());
+			if(optionalLock.isPresent())
+				return ResponseEntity.status(HttpStatus.OK).body(optionalLock.get());
+			else 
+				return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
 		}
 		log.info("GET /documents/{documentId}/lock : attribute accept wasn't set to application/json");
 		return new ResponseEntity<Lock>(HttpStatus.NOT_IMPLEMENTED);

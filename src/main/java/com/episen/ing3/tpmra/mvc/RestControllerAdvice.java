@@ -33,14 +33,14 @@ public class RestControllerAdvice extends ResponseEntityExceptionHandler  {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ErrorMessage errorMessage =  ErrorMessage.builder().message(ex.getMessage()).code(BadRequestException.BAD_REQUEST_CODE).build();
+        ErrorMessage errorMessage =  ErrorMessage.builder().errorMessage(ex.getMessage()).errorCode(BadRequestException.BAD_REQUEST_CODE).build();
         ErrorMessages errorMessages = new ErrorMessages(ErrorMessageType.fromStatus(status), errorMessage);
         return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
     }
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ErrorMessage errorMessage =  ErrorMessage.builder().message(ex.getMessage()).code(BadRequestException.BAD_REQUEST_CODE).build();
+        ErrorMessage errorMessage =  ErrorMessage.builder().errorMessage(ex.getMessage()).errorCode(BadRequestException.BAD_REQUEST_CODE).build();
         ErrorMessages errorMessages = new ErrorMessages(ErrorMessageType.fromStatus(status), errorMessage);
         return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
     }
@@ -48,7 +48,7 @@ public class RestControllerAdvice extends ResponseEntityExceptionHandler  {
     @Override
     protected ResponseEntity<Object> handleMissingServletRequestParameter(
             MissingServletRequestParameterException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        ErrorMessage errorMessage =  ErrorMessage.builder().message(ex.getMessage()).code(BadRequestException.BAD_REQUEST_CODE).build();
+        ErrorMessage errorMessage =  ErrorMessage.builder().errorMessage(ex.getMessage()).errorCode(BadRequestException.BAD_REQUEST_CODE).build();
         ErrorMessages errorMessages = new ErrorMessages(ErrorMessageType.fromStatus(status), errorMessage);
         return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
     }
@@ -59,7 +59,7 @@ public class RestControllerAdvice extends ResponseEntityExceptionHandler  {
     @ExceptionHandler(BadRequestException.class)
     public final ResponseEntity<Object> handleBadRequestException(BadRequestException ex, WebRequest request) {
     	log.info(ex.getErrorMessage().toString());
-        ErrorMessage errorMessage =  ErrorMessage.builder().message(ex.getMessage()).code(BadRequestException.BAD_REQUEST_CODE).build();
+        ErrorMessage errorMessage =  ErrorMessage.builder().errorMessage(ex.getMessage()).errorCode(BadRequestException.BAD_REQUEST_CODE).build();
         ErrorMessages errorMessages = new ErrorMessages(ErrorMessageType.fromStatus(ex.getHttpStatus()), errorMessage);
         return new ResponseEntity<>(errorMessages,ex.getHttpStatus());
     }
@@ -67,7 +67,7 @@ public class RestControllerAdvice extends ResponseEntityExceptionHandler  {
     @ExceptionHandler(ConflictException.class)
     public final ResponseEntity<Object> handleConflictException(ConflictException ex, WebRequest request) {
     	log.info(ex.getErrorMessage().toString());
-        ErrorMessage errorMessage =  ErrorMessage.builder().message(ex.getMessage()).code(ConflictException.CONFLICT_CODE).build();
+        ErrorMessage errorMessage =  ErrorMessage.builder().errorMessage(ex.getMessage()).errorCode(ConflictException.CONFLICT_CODE).build();
         ErrorMessages errorMessages = new ErrorMessages(ErrorMessageType.fromStatus(ex.getHttpStatus()), errorMessage);
         return new ResponseEntity<>(errorMessages,ex.getHttpStatus());
     }
@@ -75,7 +75,7 @@ public class RestControllerAdvice extends ResponseEntityExceptionHandler  {
     @ExceptionHandler(ForbiddenException.class)
     public final ResponseEntity<Object> handleForbiddenException(ForbiddenException ex, WebRequest request) {
     	log.info(ex.getErrorMessage().toString());
-        ErrorMessage errorMessage =  ErrorMessage.builder().message(ex.getMessage()).code(ForbiddenException.FORBIDDEN_CODE).build();
+        ErrorMessage errorMessage =  ErrorMessage.builder().errorMessage(ex.getMessage()).errorCode(ForbiddenException.FORBIDDEN_CODE).build();
         ErrorMessages errorMessages = new ErrorMessages(ErrorMessageType.fromStatus(ex.getHttpStatus()), errorMessage);
         return new ResponseEntity<>(errorMessages,ex.getHttpStatus());
     }
@@ -83,7 +83,7 @@ public class RestControllerAdvice extends ResponseEntityExceptionHandler  {
     @ExceptionHandler(NotFoundException.class)
     public final ResponseEntity<Object> handleNotFoundException(NotFoundException ex, WebRequest request) {
     	log.info(ex.getErrorMessage().toString());
-        ErrorMessage errorMessage =  ErrorMessage.builder().message(ex.getMessage()).code(NotFoundException.NOT_FOUND_CODE).build();
+        ErrorMessage errorMessage =  ErrorMessage.builder().errorMessage(ex.getMessage()).errorCode(NotFoundException.NOT_FOUND_CODE).build();
         ErrorMessages errorMessages = new ErrorMessages(ErrorMessageType.fromStatus(ex.getHttpStatus()), errorMessage);
         return new ResponseEntity<>(errorMessages,ex.getHttpStatus());
     }

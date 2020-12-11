@@ -15,8 +15,8 @@ public class ForbiddenException extends AbstractDocumentException {
     private ForbiddenException() {
         super(HttpStatus.FORBIDDEN,
                 ErrorMessage.builder()
-                		.code(FORBIDDEN_CODE)
-                        .message(FORBIDDEN_MESSAGE)
+                		.errorCode(FORBIDDEN_CODE)
+                        .errorMessage(FORBIDDEN_MESSAGE)
                         .build());
     }
 }

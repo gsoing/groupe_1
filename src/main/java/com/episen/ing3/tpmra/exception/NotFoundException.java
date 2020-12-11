@@ -15,8 +15,8 @@ public class NotFoundException extends AbstractDocumentException {
     private NotFoundException() {
         super(HttpStatus.NOT_FOUND,
                 ErrorMessage.builder()
-                        .code(NOT_FOUND_CODE)
-                        .message(NOT_FOUND_MESSAGE)
+                        .errorCode(NOT_FOUND_CODE)
+                        .errorMessage(NOT_FOUND_MESSAGE)
                         .build());
     }
 }
