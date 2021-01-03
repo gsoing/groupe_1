@@ -20,9 +20,15 @@ import com.episen.ing3.tpmra.model.DocumentsList;
 import com.episen.ing3.tpmra.repository.DocumentRepository;
 import com.episen.ing3.tpmra.repository.LockRepository;
 
+/**
+ * Vu que le verrou n'existe pas sans document vous auriez pu merger le class DocumentService et LockService
+ */
 @Service
 public class DocumentService {
 
+	/**
+	 * on n'utilise plus autowired mais l'injection par contstructeur
+	 */
 	@Autowired
 	DocumentRepository documentRepository;
 	@Autowired
@@ -33,12 +39,17 @@ public class DocumentService {
 		Page<Document> pageDocuments = documentRepository.findAll(PageRequest.of(page, pageSize));
 		List<Document> listDocuments = pageDocuments.getContent();
 		DocumentsList list = new DocumentsList(page,pageSize);
+
+		// En java 8 il existe map() qui permet de convertir les objets d'une liste
 		for(Document document: listDocuments) {
 			list.addDataItem(new DocumentSummary(document.getDocumentId(), document.getCreated(), document.getUpdated(), document.getTitle()));
 		}
 		return list;
 	}
 
+	/**
+	 * Je ne comprends pas l'intéret de la liste ici, surtout que le documentSummary ne retourne qu'une partie des informations
+	 */
 	public DocumentsList createDocument(@Valid Document body, String userName) {
 		body.setStatus(StatusEnum.CREATED);
 		OffsetDateTime dateTime = OffsetDateTime.now();
@@ -56,8 +67,12 @@ public class DocumentService {
 		return documentRepository.findById(documentId).orElseThrow(() -> NotFoundException.DEFAULT);
 	}
 
+	/**
+	 * Spring data permet de gérer l'optimistic lock, mais ok
+	 */
 	public Document updateDocument(Integer documentId, Document document, String versionETag, String userName, Boolean isRelecteur) {
 		/* Checking if exists */
+		// Vous auriez pu utiliser la méthode au dessus pour factoriser Document savedDocument = this.getSingleDocument(documentId);
 		Document savedDocument = documentRepository.findById(documentId).orElseThrow(() -> NotFoundException.DEFAULT);
 		/* Checking pessimist lock */
 		lockRepository.findById(documentId).ifPresent(lock -> { if (!lock.getOwner().equals(userName)) throw ForbiddenException.DEFAULT ; });;

@@ -25,6 +25,8 @@ public class LockService {
 	}
 
 	public Lock putDocumentLock(Integer documentId, String owner) {
+		// Cela ne fonctionne pas, si le lock est trouvé dans ce cas on doit vérifier le owner, si il est différent on doit
+		// remonter un erreur de conflit
 		lockRepository.findById(documentId).ifPresent(lock -> {throw NotFoundException.DEFAULT; });
 		if(documentRepository.findById(documentId).isPresent()) {
 			OffsetDateTime dateTime = OffsetDateTime.now();

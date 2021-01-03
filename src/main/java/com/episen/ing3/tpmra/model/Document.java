@@ -13,6 +13,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Globalement c'est ok, sachant que Spring peut gérer pas mal de chose pour vous comme les date de creations et modifications,
+ * pareil pour les creator et editor
+ */
 @Entity
 @Table(name="Document")
 public class Document extends DocumentSummary  {

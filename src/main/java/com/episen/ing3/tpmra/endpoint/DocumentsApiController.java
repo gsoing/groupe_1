@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
@@ -32,27 +33,45 @@ import com.episen.ing3.tpmra.service.LockService;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * L'implémentation de l'interface REST est globalement correcte.
+ * Quelques remarques, HttpStatus.NOT_IMPLEMENTED indique que la méthode HTTP n'est pas implémenté, ici dans votre implémentation
+ * on est plutot sur une problème de content-type donc 415 Unsupported Media Type.
+ * Pour la gestion des headers on peut utiliser l'annotation @RequestHeader, pareil pour vérifier les content-type en entrée
+ * on a les attributes consumes et produces.
+ * De plus les objet authentification et principal peuvent être passé directement en paramètre le méthode
+ */
+
 @EnableWebMvc
 @RestController
 @Slf4j
 public class DocumentsApiController {
 
-	@Autowired
+	// C'est un peu osé (même si cela fonctionne) car les objets spring sont des singletons, la requête est différente pour chaque thread
+	// pour plus de lisibibilité je préfère l'injecter au niveau de la méthode c'est plus lisible
 	private HttpServletRequest request;
 
-	@Autowired
 	private DocumentService documentService;
 
-	@Autowired
 	private LockService lockService;
+
+	public DocumentsApiController(HttpServletRequest request, DocumentService documentService, LockService lockService) {
+		this.request = request;
+		this.documentService = documentService;
+		this.lockService = lockService;
+	}
 
 	/*
 	 * GET /documents
 	 */
-	@GetMapping("/documents")
+	@GetMapping(path = "/documents", consumes = { MediaType.APPLICATION_JSON_VALUE })
 	@Secured(value = { "ROLE_REDACTEUR","ROLE_RELECTEUR" })
-	public ResponseEntity<DocumentsList> documentsGet(@Valid @RequestParam(value = "page", required = false, defaultValue="0") Integer page, @Valid @RequestParam(value = "pageSize", required = false, defaultValue="10") Integer pageSize) {
+	// Vous auriez pu utiliser le type Pageable direcement qui regroupe tout cela
+	public ResponseEntity documentsGet(@Valid @RequestParam(value = "page", required = false, defaultValue="0") Integer page,
+													  @Valid @RequestParam(value = "pageSize", required = false, defaultValue="10") Integer pageSize) {
 		log.info("GET /documents : documentsGet called with values page (" + page + "), pageSize(" + pageSize + ")");
+
+		// Comme indiqué c'est plus facile d'utiliser @RequestHeader("Accept") String accept
 		String accept = request.getHeader("Accept");
 		if (accept != null && accept.contains("application/json")) {
 			/* Main Treatment */
@@ -63,7 +82,7 @@ public class DocumentsApiController {
 					.body(list);
 		}
 		log.info("GET /documents : attribute accept wasn't set to application/json");
-		return new ResponseEntity<DocumentsList>(HttpStatus.NOT_IMPLEMENTED);
+		return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
 	}
 
 	/*
@@ -71,6 +90,7 @@ public class DocumentsApiController {
 	 */
 	@PostMapping("/documents")
 	@Secured(value = { "ROLE_REDACTEUR" })
+	// Pourquoi retourner une liste ici vu qu'on vient de créer un document
 	public ResponseEntity<DocumentsList> documentsPost(Principal principal, @Valid @RequestBody Document body) {
 		log.info("POST /documents : documentsPost called with document body '" + body + "'");
 		String accept = request.getHeader("Accept");
@@ -78,6 +98,7 @@ public class DocumentsApiController {
 			/* Main Treatment */
 			DocumentsList list = documentService.createDocument(body,principal.getName());
 			log.info("POST /documents : returning the following list " + list);
+			// Ici cela aurait été sympa de retourner l'etag en même temps
 			return ResponseEntity
 					.status(HttpStatus.CREATED)
 					.body(list);
@@ -138,6 +159,7 @@ public class DocumentsApiController {
 	/*
 	 * PUT /documents/{documentId}/status:
 	 */
+	// Vous auriez pu mettre directement le type de l'enum en entrée de la méthode, Spring fait la conversion
 	@PutMapping("/documents/{documentId}/status")
 	@Secured(value = { "ROLE_RELECTEUR" })
 	public ResponseEntity<Void> documentsDocumentIdStatusPut(@PathVariable("documentId") Integer documentId, @Valid @RequestBody String body) {
